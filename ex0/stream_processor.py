@@ -41,7 +41,6 @@ class DataProcessor(ABC):
 
     def format_output(self, result: str) -> str:
         """Format the result string for output."""
-        result = "TBA"
         return f" {bold('Output:')} {result}"
 
 
@@ -157,8 +156,8 @@ class LogProcessor(DataProcessor):
             result = f"{log_prefix} level detected: {message}"
         except (TypeError, AttributeError, InvalidLogFormatError) as e:
             result = f"{e}"
-        finally:
-            return result
+            
+        return result
 
     def validate(self, data: Any) -> bool:
         """Checks if the input is a string containing a colon."""
