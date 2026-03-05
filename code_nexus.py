@@ -47,28 +47,57 @@ class CodeNexus:
                 LogProcessor,
             )
 
-            div()
-            print(f" {W}Exercise 0 - Data Processor Foundation{O}")
-            div()
-
-            samples = [
-                (NumericProcessor(), [1, 2, 3, 4, 5]),
-                (TextProcessor(), "Hello Nexus World"),
-                (LogProcessor(), "ERROR: Connection timeout"),
-            ]
-
-            for processor, data in samples:
-                print()
-                if processor.validate(data):
-                    result = processor.process(data)
-                    print(processor.format_output(result))
-                else:
-                    print(f" {R}Validation failed for {data}{O}")
-
             print()
             div()
-            print(f" {G}✅ Exercise 0 complete!{O}")
+            print(f" {W}CODE NEXUS - DATA PROCESSOR FOUNDATION{O}")
             div()
+
+            # Collect data for Numeric Processor
+            raw = input(f" {W}Enter numbers separated by spaces: {O}")
+            numeric: list = raw.split()
+            numeric1: list = [1, 2, 3]
+
+            # Collect data for Text Processor
+            text = input(f" {W}Enter a text string: {O}")
+            text1 = "Hello World"
+
+            # Test str for Log Processor
+            log_err = "ERROR: Connection timeout"
+            log_info = "INFO: System ready"
+
+            # Numeric Processor Test
+            print()
+            np = NumericProcessor(numeric)
+            result = np.process(numeric)
+            np.validate(numeric)
+            print(np.format_output(result))
+
+            # Text Processor Test
+            print()
+            tp = TextProcessor()
+            result = tp.process(text)
+            print(tp.format_output(result))
+
+            # Log Processor Test
+            print()
+            lp = LogProcessor()
+            result = lp.process(log_err)
+            print(lp.format_output(result))
+
+            # Test all together
+            print()
+            print(f" {W}Polymorphic Processing Demo{O}")
+            div()
+            print(" Processing multiple data types through same interface...")
+            r1 = np.process(numeric1)
+            print(f" Result 1: {r1}")
+            r2 = tp.process(text1)
+            print(f" Result 2: {r2}")
+            r3 = lp.process(log_info)
+            print(f" Result 3: {r3}")
+
+            print()
+            print(" Foundation systems online. Nexus ready for advanced streams.")
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex0 — {e}{O}")

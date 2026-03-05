@@ -34,82 +34,104 @@ class DataProcessor(ABC):
 class NumericProcessor(DataProcessor):
     """Processor specifically for numerical list data."""
 
-    def __init__(self):
-        print("Initializing Numeric Processor...")
+    def __init__(self, data: Any):
+        print(" Initializing Numeric Processor...")
+        print(f" Processing data: {data}")
+
+    def process(self, data: Any) -> str:
+        """Validates and transforms data (expected: list of int)."""
+        try:
+            data_list = list(data)
+            try:
+                valid_data = [int(x) for x in data_list]
+                count = len(valid_data)
+                total: int = sum(valid_data)
+                avg: float = total / count if count > 0 else 0
+                result = (f"Processed {count} numeric values, " +
+                          f"sum={total}, avg={avg:.1f}")
+            except ValueError as e:
+                result = f"{e}"
+        except TypeError as e:
+            result = f"{e}"
+
+        return f"{result}"
 
     def validate(self, data: Any) -> bool:
-        """Checks if the input is a list of integers or floats."""
-        if isinstance(data, list) and all(isinstance(x, (int, float)) for x in data):
-            print("Validation: Numeric data verified")
-            return True
-        return False
-
-    def process(self, data: List[Union[int, float]]) -> str:
-        """Calculates count, sum, and average from the numeric list."""
-        print(f"Processing data: {data}")
-
-        count = len(data)
-        total = sum(data)
-        avg = total / count if count > 0 else 0
-
-        return (f"Processed {count} numeric values, "
-                f"sum={total}, avg={float(avg)}")
+        """Checks if the input is a list of integers."""
+        try:
+            data_list = list(data)
+            try:
+                for x in data_list:
+                    int(x)
+                print(" Validation: Numeric data verified")
+                return True
+            except ValueError as e:
+                print(f" Validation: {e}")
+                return False
+        except TypeError as e:
+            print(f" Validation: {e}")
+            return False
 
     def format_output(self, result: str) -> str:
         """Overrides base method to match the requested output style."""
-        return f"Output: {result}"
+        return f" Output: {result}"
 
 
 class TextProcessor(DataProcessor):
     """Processor specifically for string data."""
 
-    def __init__(self):
-        print("Initializing Text Processor...")
+    def __init__(self, data: Any):
+        print(" Initializing Text Processor...")
+        print(f' Processing data: "{data}"')
 
-    def validate(self, data: Any) -> bool:
-        """Checks if the input is a non-empty string."""
-        if isinstance(data, str) and len(data) > 0:
-            print("Validation: Text data verified")
-            return True
-        return False
-
-    def process(self, data: str) -> str:
+    def process(self, data: Any) -> str:
         """Calculates character count and word count."""
-        print(f'Processing data: "{data}"')
 
         char_count = len(data)
         word_count = len(data.split())
 
         return f"Processed text: {char_count} characters, {word_count} words"
 
+    def validate(self, data: Any) -> bool:
+        """Checks if the input is a non-empty string."""
+        if isinstance(data, str) and len(data) > 0:
+            print(" Validation: Text data verified")
+            return True
+        return False
+
     def format_output(self, result: str) -> str:
         """Formats the final output string."""
-        return f"Output: {result}"
+        return f" Output: {result}"
 
 
 class LogProcessor(DataProcessor):
     """Processor specifically for log message strings."""
 
-    def __init__(self):
-        print("Initializing Log Processor...")
+    def __init__(self, data: Any):
+        print(" Initializing Log Processor...")
+        print(f' Processing data: "{data}"')
 
-    def validate(self, data: Any) -> bool:
-        """Checks if the input is a string containing a colon."""
-        if isinstance(data, str) and ":" in data:
-            print("Validation: Log entry verified")
-            return True
-        return False
-
-    def process(self, data: str) -> str:
+    def process(self, data: Any) -> str:
         """Parses the log level and the message content."""
-        print(f'Processing data: "{data}"')
 
         parts = data.split(":", 1)
         log_level = parts[0].strip()
         message = parts[1].strip()
 
-        return f"{log_level} level detected: {message}"
+        if log_level == "INFO":
+            log_type = "[INFO] INFO"
+        else:
+            log_type = "[ALERT] ERROR"
+
+        return f"{log_type} level detected: {message}"
+
+    def validate(self, data: Any) -> bool:
+        """Checks if the input is a string containing a colon."""
+        if isinstance(data, str) and ":" in data:
+            print(" Validation: Log entry verified")
+            return True
+        return False
 
     def format_output(self, result: str) -> str:
         """Custom formatting to add the ALERT prefix for logs."""
-        return f"Output: [ALERT] {result}"
+        return f" Output: {result}"
