@@ -18,7 +18,7 @@ B = "\033[1;94m"
 M = "\033[1;95m"
 C = "\033[1;96m"
 W = "\033[1;97m"
-O = "\033[0m"
+O = "\033[0m"  # noqa: E741
 
 
 def div() -> None:
@@ -62,7 +62,8 @@ class CodeNexus:
             text1 = "Hello World!"
 
             # Test str for Log Processor
-            log_err = "ERROR: Connection timeout"
+            log = input(f" {W}Enter log (format: ERROR/INFO: Msg): {O}")
+            # log_err = "ERROR: Connection timeout"
             log_info = "INFO: System ready"
 
             # Numeric Processor Test
@@ -81,16 +82,16 @@ class CodeNexus:
 
             # Log Processor Test
             print()
-            lp = LogProcessor(log_err)
-            result = lp.process(log_err)
-            lp.validate(log_err)
+            lp = LogProcessor(log)
+            result = lp.process(log)
+            lp.validate(log)
             print(lp.format_output(result))
 
             # Test all together
             print()
             print(f" {W}Polymorphic Processing Demo{O}")
             div()
-            print(f" {W}Processing multiple data types through same interface...{O}")
+            print(f" {W}Processing multiple data types through same interface...{O}")  # noqa: E501
             r1 = np.process(numeric1)
             print(f" {W}Result 1:{O} {r1}")
             r2 = tp.process(text1)
@@ -99,7 +100,7 @@ class CodeNexus:
             print(f" {W}Result 3:{O} {r3}")
 
             print()
-            print(f" {W}Foundation systems online. Nexus ready for advanced streams.{O}")
+            print(f" {W}Foundation systems online. Nexus ready for advanced streams.{O}")  # noqa: E501
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex0 — {e}{O}")

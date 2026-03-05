@@ -19,6 +19,13 @@ def bold(text: str) -> str:
     return f"{w}{text}{r}"
 
 
+class InvalidLogFormatError(Exception):
+    """Raised when log data doesn't match expected format."""
+    def __init__(self) -> None:
+        self.message = "Invalid log format. Try: ERROR/INFO: Message."
+        super().__init__(self.message)
+
+
 class DataProcessor(ABC):
     """Abstract base class defining the common data processing interface."""
 
@@ -34,7 +41,8 @@ class DataProcessor(ABC):
 
     def format_output(self, result: str) -> str:
         """Format the result string for output."""
-        return f" {bold("Output:")} {result}"
+        result = "TBA"
+        return f" {bold('Output:')} {result}"
 
 
 class NumericProcessor(DataProcessor):
@@ -42,7 +50,7 @@ class NumericProcessor(DataProcessor):
 
     def __init__(self, data: Any):
         print(bold(" Initializing Numeric Processor..."))
-        print(f" {bold("Processing data:")} {data}")
+        print(f" {bold('Processing data:')} {data}")
 
     def process(self, data: Any) -> str:
         """Validates and transforms data (expected: list of int)."""
@@ -78,11 +86,11 @@ class NumericProcessor(DataProcessor):
             result = f"{e}"
             return False
         finally:
-            print(f" {bold("Validation:")} {result}")
+            print(f" {bold('Validation:')} {result}")
 
     def format_output(self, result: str) -> str:
         """Overrides base method to match the requested output style."""
-        return f" {bold("Output:")} {result}"
+        return f" {bold('Output:')} {result}"
 
 
 class TextProcessor(DataProcessor):
@@ -102,7 +110,7 @@ class TextProcessor(DataProcessor):
                       f"{word_count} words")
         except TypeError as e:
             result = f"{e}"
-        
+
         return result
 
     def validate(self, data: Any) -> bool:
@@ -111,15 +119,15 @@ class TextProcessor(DataProcessor):
             str(data)
             result = "Text data verified"
             return True
-        except TypeError:
+        except TypeError as e:
             result = f" {e}"
             return False
         finally:
-            print(f" {bold("Validation:")} {result}")
+            print(f" {bold('Validation:')} {result}")
 
     def format_output(self, result: str) -> str:
         """Formats the final output string."""
-        return f" {bold("Output:")} {result}"
+        return f" {bold('Output:')} {result}"
 
 
 class LogProcessor(DataProcessor):
@@ -128,33 +136,48 @@ class LogProcessor(DataProcessor):
     def __init__(self, data: Any):
         print(bold(" Initializing Log Processor..."))
         print(f' {bold("Processing data:")} "{data}"')
+        self.valid_log = ["ERROR", "INFO"]
 
     def process(self, data: Any) -> str:
         """Parses the log level and the message content."""
 
-        parts = data.split(":", 1)
-        log_level = parts[0].strip()
-        message = parts[1].strip()
-
-        if log_level == "INFO":
-            log_type = "[INFO] INFO"
-        else:
-            log_type = "[ALERT] ERROR"
-
-        return f"{log_type} level detected: {message}"
+        try:
+            str(data)
+            parts = data.split(":", 1)
+            if len(parts) < 2:
+                raise InvalidLogFormatError()
+            log_type = parts[0].strip()
+            if log_type not in self.valid_log:
+                raise InvalidLogFormatError()
+            if log_type == "ERROR":
+                log_prefix = "[ALERT] ERROR"
+            else:
+                log_prefix = "[INFO] INFO"
+            message = parts[1].strip()
+            result = f"{log_prefix} level detected: {message}"
+        except (TypeError, AttributeError, InvalidLogFormatError) as e:
+            result = f"{e}"
+        finally:
+            return result
 
     def validate(self, data: Any) -> bool:
         """Checks if the input is a string containing a colon."""
         try:
             str(data)
+            parts = data.split(":", 1)
+            if len(parts) < 2:
+                raise InvalidLogFormatError()
+            log_type = parts[0].strip()
+            if log_type not in self.valid_log:
+                raise InvalidLogFormatError()
             result = "Log entry verified"
             return True
-        except TypeError:
-            result = f" {e}"
+        except (TypeError, AttributeError, InvalidLogFormatError) as e:
+            result = f"{e}"
             return False
         finally:
-            print(f" {bold("Validation:")} {result}")
+            print(f" {bold('Validation:')} {result}")
 
     def format_output(self, result: str) -> str:
         """Custom formatting to add the ALERT prefix for logs."""
-        return f" {bold("Output:")} {result}"
+        return f" {bold('Output:')} {result}"
