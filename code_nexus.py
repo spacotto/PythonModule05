@@ -59,7 +59,7 @@ class CodeNexus:
 
             # Collect data for Text Processor
             text = input(f" {W}Enter a text string: {O}")
-            text1 = "Hello World"
+            text1 = "Hello World!"
 
             # Test str for Log Processor
             log_err = "ERROR: Connection timeout"
@@ -74,30 +74,32 @@ class CodeNexus:
 
             # Text Processor Test
             print()
-            tp = TextProcessor()
+            tp = TextProcessor(text)
             result = tp.process(text)
+            tp.validate(text)
             print(tp.format_output(result))
 
             # Log Processor Test
             print()
-            lp = LogProcessor()
+            lp = LogProcessor(log_err)
             result = lp.process(log_err)
+            lp.validate(log_err)
             print(lp.format_output(result))
 
             # Test all together
             print()
             print(f" {W}Polymorphic Processing Demo{O}")
             div()
-            print(" Processing multiple data types through same interface...")
+            print(f" {W}Processing multiple data types through same interface...{O}")
             r1 = np.process(numeric1)
-            print(f" Result 1: {r1}")
+            print(f" {W}Result 1:{O} {r1}")
             r2 = tp.process(text1)
-            print(f" Result 2: {r2}")
+            print(f" {W}Result 2:{O} {r2}")
             r3 = lp.process(log_info)
-            print(f" Result 3: {r3}")
+            print(f" {W}Result 3:{O} {r3}")
 
             print()
-            print(" Foundation systems online. Nexus ready for advanced streams.")
+            print(f" {W}Foundation systems online. Nexus ready for advanced streams.{O}")
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex0 — {e}{O}")

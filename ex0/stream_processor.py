@@ -13,6 +13,12 @@ from abc import ABC, abstractmethod
 from typing import Any, List, Dict, Union, Optional  # noqa: F401
 
 
+def bold(text: str) -> str:
+    """A function making strings of text bold."""
+    w, r = "\033[1;97m", "\033[0m"
+    return f"{w}{text}{r}"
+
+
 class DataProcessor(ABC):
     """Abstract base class defining the common data processing interface."""
 
@@ -28,15 +34,15 @@ class DataProcessor(ABC):
 
     def format_output(self, result: str) -> str:
         """Format the result string for output."""
-        return f"Output: {result}"
+        return f" {bold("Output:")} {result}"
 
 
 class NumericProcessor(DataProcessor):
     """Processor specifically for numerical list data."""
 
     def __init__(self, data: Any):
-        print(" Initializing Numeric Processor...")
-        print(f" Processing data: {data}")
+        print(bold(" Initializing Numeric Processor..."))
+        print(f" {bold("Processing data:")} {data}")
 
     def process(self, data: Any) -> str:
         """Validates and transforms data (expected: list of int)."""
@@ -63,53 +69,65 @@ class NumericProcessor(DataProcessor):
             try:
                 for x in data_list:
                     int(x)
-                print(" Validation: Numeric data verified")
+                result = "Numeric data verified"
                 return True
             except ValueError as e:
-                print(f" Validation: {e}")
+                result = f"{e}"
                 return False
         except TypeError as e:
-            print(f" Validation: {e}")
+            result = f"{e}"
             return False
+        finally:
+            print(f" {bold("Validation:")} {result}")
 
     def format_output(self, result: str) -> str:
         """Overrides base method to match the requested output style."""
-        return f" Output: {result}"
+        return f" {bold("Output:")} {result}"
 
 
 class TextProcessor(DataProcessor):
     """Processor specifically for string data."""
 
     def __init__(self, data: Any):
-        print(" Initializing Text Processor...")
-        print(f' Processing data: "{data}"')
+        print(bold(" Initializing Text Processor..."))
+        print(f' {bold("Processing data:")} "{data}"')
 
     def process(self, data: Any) -> str:
         """Calculates character count and word count."""
-
-        char_count = len(data)
-        word_count = len(data.split())
-
-        return f"Processed text: {char_count} characters, {word_count} words"
+        try:
+            valid_data = str(data)
+            char_count = len(valid_data)
+            word_count = len(valid_data.split())
+            result = (f"Processed text: {char_count} characters, " +
+                      f"{word_count} words")
+        except TypeError as e:
+            result = f"{e}"
+        
+        return result
 
     def validate(self, data: Any) -> bool:
         """Checks if the input is a non-empty string."""
-        if isinstance(data, str) and len(data) > 0:
-            print(" Validation: Text data verified")
+        try:
+            str(data)
+            result = "Text data verified"
             return True
-        return False
+        except TypeError:
+            result = f" {e}"
+            return False
+        finally:
+            print(f" {bold("Validation:")} {result}")
 
     def format_output(self, result: str) -> str:
         """Formats the final output string."""
-        return f" Output: {result}"
+        return f" {bold("Output:")} {result}"
 
 
 class LogProcessor(DataProcessor):
     """Processor specifically for log message strings."""
 
     def __init__(self, data: Any):
-        print(" Initializing Log Processor...")
-        print(f' Processing data: "{data}"')
+        print(bold(" Initializing Log Processor..."))
+        print(f' {bold("Processing data:")} "{data}"')
 
     def process(self, data: Any) -> str:
         """Parses the log level and the message content."""
@@ -127,11 +145,16 @@ class LogProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         """Checks if the input is a string containing a colon."""
-        if isinstance(data, str) and ":" in data:
-            print(" Validation: Log entry verified")
+        try:
+            str(data)
+            result = "Log entry verified"
             return True
-        return False
+        except TypeError:
+            result = f" {e}"
+            return False
+        finally:
+            print(f" {bold("Validation:")} {result}")
 
     def format_output(self, result: str) -> str:
         """Custom formatting to add the ALERT prefix for logs."""
-        return f" Output: {result}"
+        return f" {bold("Output:")} {result}"
