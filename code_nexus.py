@@ -113,6 +113,7 @@ class CodeNexus:
         try:
             add_exercise_folder_to_path("ex1")
             from data_stream import (
+                DataStream,
                 SensorStream,
                 TransactionStream,
                 EventStream,
@@ -123,24 +124,28 @@ class CodeNexus:
             print(f" {W}Exercise 1 - Polymorphic Streams{O}")
             div()
 
-            streams = [
-                (SensorStream("SENSOR_001"),
-                 ["temp:22.5", "humidity:65", "pressure:1013"]),
-                (TransactionStream("TRANS_001"),
-                 ["buy:100", "sell:150", "buy:75"]),
-                (EventStream("EVENT_001"),
-                 ["login", "error", "logout"]),
-            ]
+            # Collect and set stream_id
+            stream_id = input(f" {W}Enter Stream ID: {O}")
 
-            sp = StreamProcessor()
-            for stream, batch in streams:
-                print()
-                print(sp.process_stream(stream, batch))
 
+            # Collect data for Sensor Stream 
+
+            # Collect data for Transaction Strea 
+
+            # Collect data for Event Stream
+
+            # Sensor Stream Test
             print()
-            div()
-            print(f" {G}✅ Exercise 1 complete!{O}")
-            div()
+            ss = SensorStream()
+
+            # Transaction Stream Test
+            print()
+            ts = TransactionStream()
+
+            # Event Stream Test
+            print()
+            es = EventStream()
+
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex1 — {e}{O}")
