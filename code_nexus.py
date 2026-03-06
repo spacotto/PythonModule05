@@ -138,7 +138,7 @@ class CodeNexus:
             transactions: list = ["buy", "sell"]
             trans = []
     
-            for _ in range(t):
+            for _ in range(int(t)):
                 action = random.choice(transactions)
                 amount = random.randint(100, 1000)
                 trans.append(f"{action}:{amount}")
