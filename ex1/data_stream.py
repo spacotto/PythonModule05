@@ -67,11 +67,11 @@ class SensorStream(DataStream):
                 if not isinstance(val, (int, float)):
                     raise TypeError(f"Values must be int or float.")
 
-            sensor_batch: List[str] = [f"temp:{data_batch[0]}",
-                                       f"humidity:{data_batch[1]}",
-                                       f"pressure:{data_batch[2]}"]
+            t = str(data_batch[0]})
+            h = str(data_batch[1])
+            p = str({data_batch[2])
         
-            return f" {bold('Processing sensor batch:')} {sensor_batch}"
+            return f" {bold('Processing sensor batch:')} [temp:{t}, humidity:{h}, pressure:{p}]"
         
         except (ValueError, TypeError) as e:
             return f" {e}"
