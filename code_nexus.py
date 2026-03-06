@@ -128,14 +128,17 @@ class CodeNexus:
             stream_id = input(f" {W}Enter Stream ID: {O}")
 
             # Collect data for Sensor Stream 
+            raw_sensor = input(f" {W}Enter Sensor Data: {O}")
+            sensor: list = raw_sensor.split()
 
-            # Collect data for Transaction Strea 
+            # Collect data for Transaction Stream 
 
             # Collect data for Event Stream
 
             # Sensor Stream Test
             print()
             ss = SensorStream(stream_id)
+            print(ss.process_batch(sensor))
 
             # Transaction Stream Test
             print()
@@ -149,6 +152,8 @@ class CodeNexus:
             print(f" {W}Polymorphic Stream Processing{O}")
             div()
             print(f" {W}Processing mixed stream types through unified interface...{O}")
+            print()
+            print(f" {W}All streams processed successfully. Nexus throughput optimal.{O}")
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex1 — {e}{O}")

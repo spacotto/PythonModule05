@@ -59,16 +59,19 @@ class SensorStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        data_list = list(data)
         try:
-            valid_data = [int(x) for x in data_list]
-            
-            result = (f"Processed {count} numeric values, " +
-                      f"sum={total}, avg={avg:.1f}")
-        except ValueError as e:
-            result = f"{e}"
+            if len(data_batch) != 3:
+                raise ValueError(f" Expected 3 items, got {len(data_batch)}")
+        
+            valid_data = [float(x) for x in data_batch]
+            sensor_batch: List[str] = [f"temp:{valid_data[0]}",
+                                       f"humidity:{valid_data[1]}",
+                                       f"pressure:{valid_data[2]}"] 
 
-        return f"{result}"
+            return f" {bold('Processing sensor batch:')} {sensor_batch}"
+        
+        except (ValueError, TypeError) as e:
+            return f" {e}"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -130,7 +133,9 @@ class EventStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        pass
+        
+        result = f" {bold('Processing sensor batch:')} {sensor_batch}"
+        return f"{result}"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
