@@ -67,7 +67,7 @@ class SensorStream(DataStream):
                 if not isinstance(val, (int, float)):
                     raise TypeError(f"Values must be int or float.")
 
-            t = str(data_batch[0]})
+            t = str(data_batch[0])
             h = str(data_batch[1])
             p = str({data_batch[2])
         
