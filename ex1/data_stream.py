@@ -105,7 +105,22 @@ class TransactionStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        pass
+        validated_transactions = []
+        
+        try:
+            for item in data_batch:
+                if ":" not in item:
+                    raise ValueError(f"Invalid format: {item}")
+                action, value_str = item.split(":", 1)
+                if action not in ["buy", "sell"]:
+                    raise ValueError(f"Invalid action: {action}")
+                int(value_str)
+                validated_transactions.append(item)
+            trans_list = ", ".join(validated_transactions)
+            return f"Processing transaction batch: [{trans_list}]"
+        
+        except (ValueError, TypeError, AttributeError) as e:
+            return f"Error: Invalid element found in batch. {e}"
             
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
