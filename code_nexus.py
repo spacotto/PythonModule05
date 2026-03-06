@@ -145,8 +145,8 @@ class CodeNexus:
                     trans.append(f"{action}:{amount}")
 
             except Exception as e:
-                trans = ["buy:100", "sell:150", "buy:75"]
-                print(" Invalid input (int). Hard-coded examples activated.")
+                trans = t.split()
+                print(" Invalid input (int). Testing invalid list.")
 
             # Collect data for Event Stream
 
