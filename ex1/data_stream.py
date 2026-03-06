@@ -117,7 +117,7 @@ class TransactionStream(DataStream):
                 int(value_str)
                 validated_transactions.append(item)
             trans_list = ", ".join(validated_transactions)
-            return f" Processing transaction batch: [{trans_list}]"
+            return f" {bold('Processing transaction batch:')} [{trans_list}]"
         
         except (ValueError, TypeError, AttributeError) as e:
             return f" Error: Invalid element found in batch. {e}"
@@ -151,8 +151,15 @@ class EventStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        
-        return f"Event batch: {data_batch}"
+
+        try:
+            for item in data_batch:
+                if not isinstance(data_batch, str)
+                    raise TypeError(f"{item} is not a string.")
+            return f" {bold('Processing event batch:')} [{event_list}]"
+
+        except TypeError as e:
+            return f" Error: Invalid element found in batch. {e}"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
