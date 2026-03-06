@@ -7,6 +7,7 @@ Usage: python3 main.py
 """
 
 import os
+import random
 import sys
 
 
@@ -132,7 +133,15 @@ class CodeNexus:
             sensor: list = [int(x) for x in s.split()]
             # sensor: list = [22.5, 65, 1013]
 
-            # Collect data for Transaction Stream 
+            # Collect data for Transaction Stream
+            t = input(f" {W}Enter Number of Transactions to generate: {O}")
+            transactions: list = ["buy", "sell"]
+            trans = []
+    
+            for _ in range(t):
+                action = random.choice(transactions)
+                amount = random.randint(100, 1000)
+                trans.append(f"{action}:{amount}")
 
             # Collect data for Event Stream
 
@@ -144,6 +153,7 @@ class CodeNexus:
             # Transaction Stream Test
             print()
             ts = TransactionStream(stream_id)
+            print(ts.process_batch(trans))
 
             # Event Stream Test
             print()
