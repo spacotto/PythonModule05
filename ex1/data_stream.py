@@ -120,7 +120,7 @@ class TransactionStream(DataStream):
             return f" Processing transaction batch: [{trans_list}]"
         
         except (ValueError, TypeError, AttributeError) as e:
-            return f"Error: Invalid element found in batch. {e}"
+            return f" Error: Invalid element found in batch. {e}"
             
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
