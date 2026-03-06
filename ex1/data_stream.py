@@ -155,11 +155,12 @@ class EventStream(DataStream):
 
         try:
             for item in data_batch:
-                if not isinstance(data_batch, str):
+                if not isinstance(item, str):
                     raise TypeError(f"{item} is not a string.")
                 else:
                     event_list.append(f"{item}")
-            return f" {bold('Processing event batch:')} [{event_list}]"
+            event_str = ", ".join(event_list)
+            return f" {bold('Processing event batch:')} [{event_str}]"
 
         except TypeError as e:
             return f" Error: Invalid element found in batch. {e}"
