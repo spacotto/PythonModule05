@@ -128,9 +128,9 @@ class CodeNexus:
             stream_id = input(f" {W}Enter Stream ID: {O}")
 
             # Collect data for Sensor Stream 
-            # raw_sensor = input(f" {W}Enter Sensor Data: {O}")
-            # sensor: list = raw_sensor.split()
-            sensor: list = [22.5, 65, 1013]
+            s = input(f" {W}Enter Sensor Data: {O}")
+            sensor: list = int_list = [int(x) for x in s.split()]
+            # sensor: list = [22.5, 65, 1013]
 
             # Collect data for Transaction Stream 
 
