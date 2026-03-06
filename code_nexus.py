@@ -130,8 +130,13 @@ class CodeNexus:
 
             # Collect data for Sensor Stream 
             s = input(f" {W}Enter Sensor Data: {O}")
-            sensor: list = [int(x) for x in s.split()]
-            # sensor: list = [22.5, 65, 1013]
+
+            try:
+                sensor: list = [int(x) for x in s.split()]
+            
+            except Exception as e:
+                sensor: list = s.split()
+                print( Invalid input (3 int). Testing raw input.)
 
             # Collect data for Transaction Stream            
             transactions: list = ["buy", "sell"]
