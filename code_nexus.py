@@ -127,7 +127,6 @@ class CodeNexus:
             # Collect and set stream_id
             stream_id = input(f" {W}Enter Stream ID: {O}")
 
-
             # Collect data for Sensor Stream 
 
             # Collect data for Transaction Strea 
@@ -136,15 +135,15 @@ class CodeNexus:
 
             # Sensor Stream Test
             print()
-            ss = SensorStream()
+            ss = SensorStream(stream_id)
 
             # Transaction Stream Test
             print()
-            ts = TransactionStream()
+            ts = TransactionStream(stream_id)
 
             # Event Stream Test
             print()
-            es = EventStream()
+            es = EventStream(stream_id)
 
 
         except ImportError as e:

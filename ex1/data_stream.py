@@ -46,7 +46,6 @@ class SensorStream(DataStream):
     def __init__(self, stream_id: str):
         """Print header and Stream ID format."""
         super().__init__(stream_id)
-        self.stream_id = stream_id
 
         print(bold(" Initializing Sensor Stream..."))
         try:
@@ -78,7 +77,6 @@ class TransactionStream(DataStream):
     def __init__(self, stream_id: str):
         """Print header and Stream ID format."""
         super().__init__(stream_id)
-        self.stream_id = stream_id
 
         print(bold(" Initializing Transaction Stream..."))
         try:
@@ -110,7 +108,6 @@ class EventStream(DataStream):
     def __init__(self, stream_id: str):
         """Print header and Stream ID format."""
         super().__init__(stream_id)
-        self.stream_id = stream_id
 
         print(bold(" Initializing Event Stream..."))
         try:
