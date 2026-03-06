@@ -63,11 +63,14 @@ class SensorStream(DataStream):
             if len(data_batch) != 3:
                 raise ValueError(f" Expected 3 items, got {len(data_batch)}")
         
-            valid_data = [float(x) for x in data_batch]
-            sensor_batch: List[str] = [f"temp:{valid_data[0]}",
-                                       f"humidity:{valid_data[1]}",
-                                       f"pressure:{valid_data[2]}"] 
+            for val in data_batch:
+                if not isinstance(val, (int, float)):
+                    raise TypeError(f"Values must be int or float.")
 
+            sensor_batch: List[str] = [f"temp:{data_batch[0]}",
+                                       f"humidity:{data_batch[1]}",
+                                       f"pressure:{data_batch[2]}"]
+        
             return f" {bold('Processing sensor batch:')} {sensor_batch}"
         
         except (ValueError, TypeError) as e:
