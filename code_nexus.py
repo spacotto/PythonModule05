@@ -114,7 +114,6 @@ class CodeNexus:
         try:
             add_exercise_folder_to_path("ex1")
             from data_stream import (
-                DataStream,
                 SensorStream,
                 TransactionStream,
                 EventStream,
@@ -129,23 +128,28 @@ class CodeNexus:
             stream_id = input(f" {W}Enter Stream ID: {O}")
 
             # Collect data for Sensor Stream 
-            s = input(f" {W}Enter Sensor Data: {O}")
+            sensors: list = ["temperature", "humidity", "pressure"]
+            readings = []
+            s = input(f" {W}Sensor Data: How many entries?{O} ")
 
             try:
-                sensor: list = [int(x) for x in s.split()]
-            
+                for _ in range(int(s)):
+                    sensor = random.choice(sensors)
+                    reading_value = random.randint(100, 1000)
+                    readings.append(f"{sensor}:{reading_value}")
+
             except Exception as e:
-                sensor: list = s.split()
-                print(" Invalid input (3 int). Testing raw input.")
+                readings = s.split()
+                print(" Invalid input (int). Testing raw input.")
 
             # Collect data for Transaction Stream            
-            transactions: list = ["buy", "sell"]
+            valid_trans: list = ["buy", "sell"]
             trans = []
-            t = input(f" {W}Enter Transaction Data: {O}")
+            t = input(f" {W}Transaction Data: How many entries?{O} ")
 
             try:
                 for _ in range(int(t)):
-                    action = random.choice(transactions)
+                    action = random.choice(valid_trans)
                     amount = random.randint(100, 1000)
                     trans.append(f"{action}:{amount}")
 
@@ -154,23 +158,22 @@ class CodeNexus:
                 print(" Invalid input (int). Testing raw input.")
 
             # Collect data for Event Stream
-            events: list = ["error", "login", "logout"]
-            event = []
-            en = input(f" {W}Enter Event Data: {O}")
+            valid_events: list = ["error", "login", "logout"]
+            events = []
+            n = input(f" {W}Event Data: How many entries?{O} ")
 
             try:
-                for _ in range(int(en)):
-                    action = random.choice(events)
-                    event.append(f"{random.choice(events)}")
+                for _ in range(int(n)):
+                    events.append(f"{random.choice(valid_events)}")
 
             except Exception as e:
-                event = t.split()
+                events = n.split()
                 print(" Invalid input (int). Testing raw input.")
 
             # Sensor Stream Test
             print()
             ss = SensorStream(stream_id)
-            print(ss.process_batch(sensor))
+            print(ss.process_batch(readings))
 
             # Transaction Stream Test
             print()
@@ -180,7 +183,7 @@ class CodeNexus:
             # Event Stream Test
             print()
             es = EventStream(stream_id)
-            print(es.process_batch(event))
+            print(es.process_batch(events))
 
             print()
             print(f" {W}Polymorphic Stream Processing{O}")

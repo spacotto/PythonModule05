@@ -59,22 +59,25 @@ class SensorStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        try:
-            if len(data_batch) != 3:
-                raise ValueError(f" Expected 3 items, got {len(data_batch)}")
-        
-            for val in data_batch:
-                if not isinstance(val, (int, float)):
-                    raise TypeError(f"Values must be int or float.")
+        valid_readings = []
 
-            t = str(data_batch[0])
-            h = str(data_batch[1])
-            p = str(data_batch[2])
-        
-            return f" {bold('Processing sensor batch:')} [temp:{t}, humidity:{h}, pressure:{p}]"
-        
-        except (ValueError, TypeError) as e:
-            return f" {e}"
+        try:
+            for item in data_batch:
+                if ":" not in item:
+                    raise ValueError(f"Invalid format: {item}")
+                sensor, reading = item.split(":", 1)
+                if sensor not in ["temperature", "humidity", "pressure"]:
+                    raise ValueError(f"Invalid sensor {sensor}")
+                try:
+                    float(reading)
+                except ValueError:
+                    int(reading)
+                valid_readings.append(item)
+            reading_list = ", ".join(valid_readings)
+            return f" {bold('Processing sensor batch:')} [{reading_list}]"
+
+        except (ValueError, TypeError, AttributeError) as e:
+            return f" Error: Invalid element found in batch. {e}"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -151,18 +154,19 @@ class EventStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        event_list = []
+        valid_events = []
 
         try:
-            for item in data_batch:
-                if not isinstance(item, str):
-                    raise TypeError(f"{item} is not a string.")
-                else:
-                    event_list.append(f"{item}")
-            event_str = ", ".join(event_list)
-            return f" {bold('Processing event batch:')} [{event_str}]"
-
-        except TypeError as e:
+            for event in data_batch:
+                if not isinstance(event, str):
+                    raise TypeError(f"Events must be str.")
+                if event not in ["error", "login", "logout"]:
+                    raise ValueError(f"Invalid event: {event}")
+                valid_events.append(event)
+            events_str = ", ".join(valid_events)
+            return f" {bold('Processing event batch:')} [{events_str}]"
+        
+        except (TypeError, ValueError) as e:
             return f" Error: Invalid element found in batch. {e}"
 
     def filter_data(self, data_batch: List[Any],
