@@ -152,8 +152,7 @@ class EventStream(DataStream):
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
         
-        result = f" {bold('Processing sensor batch:')} {sensor_batch}"
-        return f"{result}"
+        return f"Event batch: {data_batch}"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
