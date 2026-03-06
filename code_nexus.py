@@ -133,15 +133,20 @@ class CodeNexus:
             sensor: list = [int(x) for x in s.split()]
             # sensor: list = [22.5, 65, 1013]
 
-            # Collect data for Transaction Stream
-            t = input(f" {W}Enter Number of Transactions to generate: {O}")
+            # Collect data for Transaction Stream            
             transactions: list = ["buy", "sell"]
             trans = []
-    
-            for _ in range(int(t)):
-                action = random.choice(transactions)
-                amount = random.randint(100, 1000)
-                trans.append(f"{action}:{amount}")
+            t = input(f" {W}Enter Transaction Data: {O}")
+
+            try:
+                for _ in range(int(t)):
+                    action = random.choice(transactions)
+                    amount = random.randint(100, 1000)
+                    trans.append(f"{action}:{amount}")
+
+            except Exception as e:
+                trans = ["buy:100", "sell:150", "buy:75"]
+                print(" Invalid input (int). Hard-coded examples activated.")
 
             # Collect data for Event Stream
 
