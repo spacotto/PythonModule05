@@ -136,7 +136,7 @@ class CodeNexus:
             
             except Exception as e:
                 sensor: list = s.split()
-                print( Invalid input (3 int). Testing raw input.)
+                print(" Invalid input (3 int). Testing raw input.")
 
             # Collect data for Transaction Stream            
             transactions: list = ["buy", "sell"]
