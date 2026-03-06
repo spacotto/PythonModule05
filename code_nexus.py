@@ -154,6 +154,18 @@ class CodeNexus:
                 print(" Invalid input (int). Testing raw input.")
 
             # Collect data for Event Stream
+            events: list = ["error", "login", "logout"]
+            event = []
+            en = input(f" {W}Enter Event Data: {O}")
+
+            try:
+                for _ in range(int(en)):
+                    action = random.choice(events)
+                    trans.append(f"{random.choice(events)}")
+
+            except Exception as e:
+                event = t.split()
+                print(" Invalid input (int). Testing raw input.")
 
             # Sensor Stream Test
             print()
@@ -168,6 +180,7 @@ class CodeNexus:
             # Event Stream Test
             print()
             es = EventStream(stream_id)
+            print(es.process_batch(event))
 
             print()
             print(f" {W}Polymorphic Stream Processing{O}")
