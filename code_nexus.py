@@ -146,7 +146,7 @@ class CodeNexus:
 
             except Exception as e:
                 trans = t.split()
-                print(" Invalid input (int). Testing invalid list.")
+                print(" Invalid input (int). Testing raw input.")
 
             # Collect data for Event Stream
 
