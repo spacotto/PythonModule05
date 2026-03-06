@@ -154,7 +154,7 @@ class EventStream(DataStream):
 
         try:
             for item in data_batch:
-                if not isinstance(data_batch, str)
+                if not isinstance(data_batch, str):
                     raise TypeError(f"{item} is not a string.")
             return f" {bold('Processing event batch:')} [{event_list}]"
 
