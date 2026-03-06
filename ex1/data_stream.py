@@ -156,6 +156,8 @@ class EventStream(DataStream):
             for item in data_batch:
                 if not isinstance(data_batch, str):
                     raise TypeError(f"{item} is not a string.")
+                else:
+                    event_list.append(f"{item}")
             return f" {bold('Processing event batch:')} [{event_list}]"
 
         except TypeError as e:
