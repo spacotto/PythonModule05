@@ -161,7 +161,7 @@ class CodeNexus:
             try:
                 for _ in range(int(en)):
                     action = random.choice(events)
-                    trans.append(f"{random.choice(events)}")
+                    event.append(f"{random.choice(events)}")
 
             except Exception as e:
                 event = t.split()
