@@ -69,7 +69,7 @@ class SensorStream(DataStream):
 
             t = str(data_batch[0])
             h = str(data_batch[1])
-            p = str({data_batch[2])
+            p = str(data_batch[2])
         
             return f" {bold('Processing sensor batch:')} [temp:{t}, humidity:{h}, pressure:{p}]"
         
