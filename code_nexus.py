@@ -129,7 +129,7 @@ class CodeNexus:
 
             # Collect data for Sensor Stream 
             s = input(f" {W}Enter Sensor Data: {O}")
-            sensor: list = int_list = [int(x) for x in s.split()]
+            sensor: list = [int(x) for x in s.split()]
             # sensor: list = [22.5, 65, 1013]
 
             # Collect data for Transaction Stream 
