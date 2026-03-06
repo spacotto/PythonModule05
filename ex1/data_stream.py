@@ -117,7 +117,7 @@ class TransactionStream(DataStream):
                 int(value_str)
                 validated_transactions.append(item)
             trans_list = ", ".join(validated_transactions)
-            return f"Processing transaction batch: [{trans_list}]"
+            return f" Processing transaction batch: [{trans_list}]"
         
         except (ValueError, TypeError, AttributeError) as e:
             return f"Error: Invalid element found in batch. {e}"
