@@ -151,6 +151,7 @@ class EventStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
+        event_list = []
 
         try:
             for item in data_batch:
