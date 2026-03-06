@@ -59,7 +59,16 @@ class SensorStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        pass
+        data_list = list(data)
+        try:
+            valid_data = [int(x) for x in data_list]
+            
+            result = (f"Processed {count} numeric values, " +
+                      f"sum={total}, avg={avg:.1f}")
+        except ValueError as e:
+            result = f"{e}"
+
+        return f"{result}"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:

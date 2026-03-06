@@ -145,6 +145,10 @@ class CodeNexus:
             print()
             es = EventStream(stream_id)
 
+            print()
+            print(f" {W}Polymorphic Stream Processing{O}")
+            div()
+            print(f" {W}Processing mixed stream types through unified interface...{O}")
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex1 — {e}{O}")
