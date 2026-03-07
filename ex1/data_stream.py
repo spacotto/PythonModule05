@@ -22,13 +22,24 @@ class DataStream(ABC):
 
     def __init__(self, stream_id: str) -> None:
         """Print Stream ID."""
-        self.stream_id = stream_id
-        self.batch = []
+        self._stream_id = self._format_id(stream_id)
+        self._batch = []
+
+    def _format_id(self, stream_id: str) -> str:
+        """Validate and format stream ID to 3-digit string."""
+        try:
+            num = int(stream_id)
+            if num < 1 or num > 100:
+                raise ValueError("Stream ID must be between 1 and 100")
+            return f"{num:03d}"
+        except ValueError as e:
+            print(f" {e}")
+            return None
 
     @abstractmethod
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        self.batch = data_batch
+        self._batch = data_batch
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -39,30 +50,23 @@ class DataStream(ABC):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-        pass
+        return {"stream_id": self._stream_id,
+                "batch": self_batch}
 
 
 class SensorStream(DataStream):
     """Handles environmental sensor data streams
     (temperature, humidity, pressure)."""
 
-    def __init__(self, stream_id: str):
+    def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
         super().__init__(stream_id)
-
         print(bold(" Initializing Sensor Stream..."))
-        try:
-            num = int(self.stream_id)
-            if num < 1 or num > 100:
-                raise ValueError(f"Stream ID must be between 1 and 100")
-            n = f"{num:03d}"
-            print(f" {bold('Stream ID:')} SENSOR_{n}, Type: Environmental Data")
-        except ValueError as e:
-            print(f" {e}")
+        if self._stream_id:
+            print(f" {bold('Stream ID:')} SENSOR_{self._stream_id}, Type: Environmental Data")
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        valid_readings = []
 
         try:
             for item in data_batch:
@@ -75,12 +79,14 @@ class SensorStream(DataStream):
                     float(reading)
                 except ValueError:
                     int(reading)
-                valid_readings.append(item)
-            reading_list = ", ".join(valid_readings)
-            return f" {bold('Processing sensor batch:')} [{reading_list}]"
+                self._batch.append(item)
+            reading_list = ", ".join(self._batch)
+            print(f" {bold('Processing sensor batch:')} [{reading_list}]")
+            return "OK"
 
         except (ValueError, TypeError, AttributeError) as e:
-            return f" Error: Invalid element found in batch. {e}"
+            print(f" Error: Invalid element found in batch. {e}")
+            return "KO"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -90,8 +96,7 @@ class SensorStream(DataStream):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-
-        print(f" {bold('Sensor analysis:')} {n} readings processed, avg temp: {avg}")
+        pass
 
 class TransactionStream(DataStream):
     """Handles financial transaction data streams (buy/sell operations)."""

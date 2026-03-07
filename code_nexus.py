@@ -173,7 +173,7 @@ class CodeNexus:
             # Sensor Stream Test
             print()
             ss = SensorStream(stream_id)
-            print(ss.process_batch(readings))
+            ss.process_batch(readings)
 
             # Transaction Stream Test
             print()
