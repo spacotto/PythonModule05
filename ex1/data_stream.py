@@ -106,7 +106,7 @@ class TransactionStream(DataStream):
         super().__init__(stream_id)
         print(bold(" Initializing Transaction Stream..."))
         if self._stream_id:
-            print(f" {bold('Stream ID:')} TRANS_{n}, Type: Financial Data")
+            print(f" {bold('Stream ID:')} TRANS_{self._stream_id}, Type: Financial Data")
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
@@ -142,13 +142,11 @@ class EventStream(DataStream):
     """Handles system event data streams (login, logout, errors)."""
     
     def __init__(self, stream_id: str):
-    """Print header and Stream ID format."""
+        """Print header and Stream ID format."""
         super().__init__(stream_id)
         print(bold(" Initializing Event Stream..."))
         if self._stream_id:
-            print(f" {bold('Stream ID:')} EVENT_{n}, Type: System Events")
-        """Print header and Stream ID format."""
-        super().__init__(stream_id)
+            print(f" {bold('Stream ID:')} EVENT_{self._stream_id}, Type: System Events")
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""

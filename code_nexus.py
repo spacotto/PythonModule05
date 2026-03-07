@@ -177,12 +177,12 @@ class CodeNexus:
 
             # Transaction Stream Test
             print()
-            ts = TransactionStream(stream_id)
+            ts = TransactionStream("42")
             print(ts.process_batch(trans))
 
             # Event Stream Test
             print()
-            es = EventStream(stream_id)
+            es = EventStream("88")
             print(es.process_batch(events))
 
             print()
