@@ -23,16 +23,19 @@ class DataStream(ABC):
     def __init__(self, stream_id: str) -> None:
         """Print Stream ID."""
         self.stream_id = stream_id
+        self.batch = []
 
     @abstractmethod
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        pass
+        self.batch = data_batch
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         """Filter data based on criteria."""
-        pass
+        if criteria is None:
+            return data_batch
+        return [data for data in data_batch if criteria in data]
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
@@ -82,12 +85,13 @@ class SensorStream(DataStream):
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         """Filter data based on criteria."""
-        pass
+        filtered = super().filter_data(data_batch, criteria)
+        return filtered
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-        pass
 
+        print(f" {bold('Sensor analysis:')} {n} readings processed, avg temp: {avg}")
 
 class TransactionStream(DataStream):
     """Handles financial transaction data streams (buy/sell operations)."""
@@ -128,8 +132,9 @@ class TransactionStream(DataStream):
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         """Filter data based on criteria."""
-        pass
-
+        filtered = super().filter_data(data_batch, criteria)
+        return filtered
+            
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
         pass
@@ -172,7 +177,8 @@ class EventStream(DataStream):
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         """Filter data based on criteria."""
-        pass
+        filtered = super().filter_data(data_batch, criteria)
+        return filtered
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
