@@ -46,7 +46,8 @@ class DataStream(ABC):
         """Filter data based on criteria."""
         if criteria is None:
             return data_batch
-        return [data for data in data_batch if criteria in data]
+        keywords = criteria.split()
+        return [data for data in data_batch any(k in item for k in keywords)]
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
@@ -217,5 +218,11 @@ class EventStream(DataStream):
 class StreamProcessor:
     """Manages and processes multiple stream types
     through a unified polymorphic interface."""
-    def process_stream(self, stream: DataStream, batch: List[Any]) -> str:
-        return stream.process_batch(batch)
+
+    def __init__(self) -> None:
+        """..."""
+        pass
+
+    def stream_analysis(self, Dict[str, Union[str, int, float]) -> None:
+        """..."""
+        print(f"")
