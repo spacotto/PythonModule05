@@ -50,8 +50,7 @@ class DataStream(ABC):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-        return {"stream_id": self._stream_id,
-                "batch": self_batch}
+        return {"stream_id": self._stream_id}
 
 
 class SensorStream(DataStream):
@@ -67,6 +66,7 @@ class SensorStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
+        self._batch = []
 
         try:
             for item in data_batch:
@@ -96,7 +96,41 @@ class SensorStream(DataStream):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-        pass
+        stats: dict = {}
+
+        stream_id: str = ""
+        readings_processed: int = 0
+        avg_t: float = 0.0
+        avg_h: float = 0.0
+        avg_p: float = 0.0
+        csa: int = 0
+
+        stream_id = self._stream_id if self._stream_id else "Invalid Stream ID"
+
+        if self._batch:
+            readings_processed = len(self._batch)
+
+        temps = [float(item.split(":")[1]) for item in self._batch if "temperature" in item]
+        avg_t = sum(temps) / len(temps) if temps else 0.0
+
+        hums = [float(item.split(":")[1]) for item in self._batch if "humidity" in item]
+        avg_h = sum(hums) / len(hums) if hums else 0.0
+
+        press = [float(item.split(":")[1]) for item in self._batch if "pressure" in item]
+        avg_p = sum(press) / len(press) if press else 0.0
+
+        thresholds = {"temperature": 800, "humidity": 850, "pressure": 900}
+        if self._batch:
+            csa = len([item for item in self._batch if float(item.split(":")[1]) > threshold])
+
+        stats = {"stream_id": stream_id,
+                 "readings_processed": readings_processed,
+                 "avg_temperature": avg_t,
+                 "avg_humidity": avg_h,
+                 "avg_pressure": avg_p,
+                 "critical_sensor_alerts": csa}
+
+        return stats
 
 class TransactionStream(DataStream):
     """Handles financial transaction data streams (buy/sell operations)."""
@@ -110,6 +144,7 @@ class TransactionStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
+        self._batch = []
         
         try:
             for item in data_batch:
@@ -151,6 +186,7 @@ class EventStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
+        self._batch = []
 
         try:
             for event in data_batch:

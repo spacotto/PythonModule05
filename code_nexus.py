@@ -132,10 +132,15 @@ class CodeNexus:
             readings = []
             s = input(f" {W}Sensor Data: How many entries?{O} ")
 
+            ranges = {"temperature": (15, 60),
+                      "humidity": (20, 100),
+                      "pressure": (980, 1060)}
+
             try:
                 for _ in range(int(s)):
                     sensor = random.choice(sensors)
-                    reading_value = random.randint(100, 1000)
+                    low, high = ranges[sensor]
+                    reading_value = random.randint(low, high)
                     readings.append(f"{sensor}:{reading_value}")
 
             except Exception as e:
