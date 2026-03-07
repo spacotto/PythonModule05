@@ -191,8 +191,57 @@ class TransactionStream(DataStream):
 
 class EventStream(DataStream):
     """Handles system event data streams (login, logout, errors)."""
-    pass 
 
+    def __init__(self, stream_id: str) -> None:
+        """Print header and Stream ID format."""
+        self._stream_id: str = ""
+        self._events: int = 0
+        self._errors: int = 0
+        super().__init__(stream_id)
+
+    def _parse_batch(self, data_batch: List[Any]) -> None:
+        """Parse and validate batch, store valid items in self._batch."""
+        self._batch = []
+
+        for item in data_batch:
+            try:
+                if not isinstance(item, str):
+                    raise TypeError(f"Events must be str.")
+                if item not in ["error", "login", "logout"]:
+                    raise ValueError(f"Invalid event: {item}")
+                self._batch.append(item)
+            except (TypeError, ValueError):
+                continue
+
+    def _run_analysis(self) -> None:
+        """Compute and store stats from self._batch."""
+        self._events = len(self._batch)
+        self._errors = len([i for i in self._batch if i == "error"])
+
+    def process_batch(self, data_batch: List[Any]) -> str:
+        """Process a batch of data."""
+        self._parse_batch(data_batch)
+        if not self._batch:
+            print(f" Error: No valid event data found in batch.")
+            return ""
+        self._run_analysis()
+        batch_str = ", ".join(self._batch)
+        return batch_str
+
+    def filter_data(self, data_batch: List[Any],
+                    criteria: Optional[str] = None) -> List[Any]:
+        """Filter data based on criteria."""
+        return super().filter_data(data_batch, criteria)
+
+    def get_stats(self) -> Dict[str, Union[str, int, float]]:
+        """Return stream statistics."""
+        stats: dict = {}
+
+        stats = {"stream_id": self._stream_id,
+                 "events": self._events,
+                 "errors": self._errors}
+
+        return stats
 
 class StreamProcessor:
     """Manages and processes multiple stream types
@@ -220,6 +269,9 @@ def main() -> None:
     t1 = ts.process_batch(data_batch0)
     dt = ts.get_stats()
 
+    es = EventStream(stream_id)
+    e1 = es.process_batch(data_batch0)
+    de = es.get_stats()
 
     print(" === CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
     print()
@@ -236,9 +288,9 @@ def main() -> None:
           f"net flow: +{dt['net_flow']} units")
     print()
     print(" Initializing Event Stream...")
-    print(" Stream ID: EVENT_001, Type: System Events")
-    print(" Processing event batch: [login, error, logout]")
-    print(" Event analysis: 3 events, 1 error detected")
+    print(f" Stream ID: EVENT_{de['stream_id']}, Type: System Events")
+    print(f" Processing event batch: [{e1}]")
+    print(f" Event analysis: {de['events']} events, {de['errors']} error detected")
     print()
     
     data_batch1 = []
