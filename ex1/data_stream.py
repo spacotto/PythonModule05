@@ -129,16 +129,20 @@ class SensorStream(DataStream):
 class TransactionStream(DataStream):
     """Handles financial transaction data streams (buy/sell operations)."""
 
+class TransactionStream(DataStream):
+    """Handles financial transaction data streams (buy/sell operations)."""
+
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
+        self._stream_id: str = ""
+        self._operations: int = 0
+        self._net_flow: int = 0
         super().__init__(stream_id)
-        if self._stream_id:
-            print(f" {bold('Stream ID:')} TRANS_{self._stream_id}, Type: Financial Data")
 
-    def process_batch(self, data_batch: List[Any]) -> str:
-        """Process a batch of data."""
+    def _parse_batch(self, data_batch: List[Any]) -> None:
+        """Parse and validate batch, store valid items in self._batch."""
         self._batch = []
-        
+
         for item in data_batch:
             try:
                 if ":" not in item:
@@ -151,65 +155,43 @@ class TransactionStream(DataStream):
             except (ValueError, TypeError, AttributeError):
                 continue
 
+    def _run_analysis(self) -> None:
+        """Compute and store stats from self._batch."""
+        self._operations = len(self._batch)
+        self._net_flow = sum(
+            int(i.split(":")[1]) if "buy" in i
+            else -int(i.split(":")[1]) for i in self._batch
+        )
+
+    def process_batch(self, data_batch: List[Any]) -> str:
+        """Process a batch of data."""
+        self._parse_batch(data_batch)
         if not self._batch:
             print(f" Error: No valid transaction data found in batch.")
-            return "KO"
-
+            return ""
+        self._run_analysis()
         batch_str = ", ".join(self._batch)
-        print(f" {bold('Processing transaction batch:')} [{batch_str}]")
-        return "OK"
+        return batch_str
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         """Filter data based on criteria."""
-        filtered = super().filter_data(data_batch, criteria)
-        return filtered
-            
+        return super().filter_data(data_batch, criteria)
+
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-        pass
+        stats: dict = {}
+
+        stats = {"stream_id": self._stream_id,
+                 "operations": self._operations,
+                 "net_flow": self._net_flow}
+
+        return stats
 
 
 class EventStream(DataStream):
     """Handles system event data streams (login, logout, errors)."""
-    
-    def __init__(self, stream_id: str):
-        """Print header and Stream ID format."""
-        super().__init__(stream_id)
-        if self._stream_id:
-            print(f" {bold('Stream ID:')} EVENT_{self._stream_id}, Type: System Events")
-
-    def process_batch(self, data_batch: List[Any]) -> str:
-        """Process a batch of data."""
-        self._batch = []
-
-        for item in data_batch:
-            try:
-                if not isinstance(item, str):
-                    raise TypeError(f"Events must be str.")
-                if item not in ["error", "login", "logout"]:
-                    raise ValueError(f"Invalid event: {item}")
-                self._batch.append(item)
-            except (TypeError, ValueError):
-                continue
-
-        if not self._batch:
-            print(f" Error: No valid event data found in batch.")
-            return "KO"
-
-        batch_str = ", ".join(self._batch)
-        print(f" {bold('Processing event batch:')} [{batch_str}]")
-        return "OK"
-
-    def filter_data(self, data_batch: List[Any],
-                    criteria: Optional[str] = None) -> List[Any]:
-        """Filter data based on criteria."""
-        filtered = super().filter_data(data_batch, criteria)
-        return filtered
-
-    def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        """Return stream statistics."""
-        pass
+    pass 
 
 
 class StreamProcessor:
@@ -234,18 +216,24 @@ def main() -> None:
     s1 = ss.process_batch(data_batch0)
     ds = ss.get_stats()
 
+    ts = TransactionStream(stream_id)
+    t1 = ts.process_batch(data_batch0)
+    dt = ts.get_stats()
+
+
     print(" === CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
     print()
     print(" Initializing Sensor Stream...")
-    print(f" Stream ID: SENSOR_{ds["stream_id"]}, Type: Environmental Data")
+    print(f" Stream ID: SENSOR_{ds['stream_id']}, Type: Environmental Data")
     print(f" Processing sensor batch: [{s1}]")
-    print(f" Sensor analysis: {ds["readings_processed"]} " +
-          f"readings processed, avg temp: {ds["avg_temperature"]}")
+    print(f" Sensor analysis: {ds['readings_processed']} " +
+          f"readings processed, avg temp: {ds['avg_temperature']}")
     print()
     print(" Initializing Transaction Stream...")
-    print(" Stream ID: TRANS_001, Type: Financial Data")
-    print(" Processing transaction batch: [buy:100, sell:150, buy:75]")
-    print(" Transaction analysis: 3 operations, net flow: +25 units")
+    print(f" Stream ID: TRANS_{dt['stream_id']}, Type: Financial Data")
+    print(f" Processing transaction batch: [{t1}]")
+    print(f" Transaction analysis: {dt['operations']} operations," +
+          f"net flow: +{dt['net_flow']} units")
     print()
     print(" Initializing Event Stream...")
     print(" Stream ID: EVENT_001, Type: System Events")
