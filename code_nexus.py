@@ -22,6 +22,12 @@ W = "\033[1;97m"
 O = "\033[0m"  # noqa: E741
 
 
+def bold(text: str) -> str:
+    """A function making strings of text bold."""
+    w, r = "\033[1;97m", "\033[0m"
+    return f"{w}{text}{r}"
+
+
 def div() -> None:
     """Prints a line divider."""
     print(" " + "-" * 60)
@@ -179,7 +185,8 @@ class CodeNexus:
             # Sensor Stream Test
             print()
             ss = SensorStream(stream_id)
-            ss.process_batch(data_batch)
+            sensor_batch = ss.process_batch(data_batch)
+            print(f" {bold('Processing sensor batch:')} [{batch_str}]")
 
             # Transaction Stream Test
             print()
