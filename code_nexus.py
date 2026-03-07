@@ -127,9 +127,11 @@ class CodeNexus:
             # Collect and set stream_id
             stream_id = input(f" {W}Enter Stream ID: {O}")
 
-            # Collect data for Sensor Stream 
-            sensors: list = ["temperature", "humidity", "pressure"]
-            readings = []
+            # Initialise the batch of data where all gen data will be stored
+            data_batch: list = []
+
+            # Collect and add data for Sensor Stream 
+            valid_sensors: list = ["temperature", "humidity", "pressure"]
             s = input(f" {W}Sensor Data: How many entries?{O} ")
 
             ranges = {"temperature": (15, 60),
@@ -138,57 +140,59 @@ class CodeNexus:
 
             try:
                 for _ in range(int(s)):
-                    sensor = random.choice(sensors)
+                    sensor = random.choice(valid_sensors)
                     low, high = ranges[sensor]
                     reading_value = random.randint(low, high)
-                    readings.append(f"{sensor}:{reading_value}")
+                    data_batch.append(f"{sensor}:{reading_value}")
 
             except Exception as e:
-                readings = s.split()
-                print(" Invalid input (int). Testing raw input.")
+                data_batch.extend(s.split())
+                print(" Invalid generator input (int). Testing raw input.")
 
-            # Collect data for Transaction Stream            
+            # Collect and add data for Transaction Stream            
             valid_trans: list = ["buy", "sell"]
-            trans = []
             t = input(f" {W}Transaction Data: How many entries?{O} ")
 
             try:
                 for _ in range(int(t)):
                     action = random.choice(valid_trans)
                     amount = random.randint(100, 1000)
-                    trans.append(f"{action}:{amount}")
+                    data_batch.append(f"{action}:{amount}")
 
             except Exception as e:
-                trans = t.split()
-                print(" Invalid input (int). Testing raw input.")
+                data_batch.extend(t.split())
+                print(" Invalid generator input (int). Testing raw input.")
 
-            # Collect data for Event Stream
+            # Collect and add data for Event Stream
             valid_events: list = ["error", "login", "logout"]
             events = []
             n = input(f" {W}Event Data: How many entries?{O} ")
 
             try:
                 for _ in range(int(n)):
-                    events.append(f"{random.choice(valid_events)}")
+                    data_batch.append(f"{random.choice(valid_events)}")
 
             except Exception as e:
-                events = n.split()
-                print(" Invalid input (int). Testing raw input.")
+                data_batch.extend(n.split())
+                print(" Invalid generator input (int). Testing raw input.")
 
             # Sensor Stream Test
             print()
             ss = SensorStream(stream_id)
-            ss.process_batch(readings)
+            ss.process_batch(data_batch)
 
             # Transaction Stream Test
             print()
-            ts = TransactionStream("42")
-            ts.process_batch(trans)
+            ts = TransactionStream(stream_id)
+            ts.process_batch(data_batch)
 
             # Event Stream Test
             print()
-            es = EventStream("88")
-            es.process_batch(events)
+            es = EventStream(stream_id)
+            es.process_batch(data_batch)
+            
+            # Polymorphic test
+            sp = StreamProcessor()
 
             print()
             print(f" {W}Polymorphic Stream Processing{O}")

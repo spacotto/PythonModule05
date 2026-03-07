@@ -47,7 +47,7 @@ class DataStream(ABC):
         if criteria is None:
             return data_batch
         keywords = criteria.split()
-        return [data for data in data_batch any(k in item for k in keywords)]
+        return [data for data in data_batch if any(k in data for k in keywords)]
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
@@ -69,25 +69,28 @@ class SensorStream(DataStream):
         """Process a batch of data."""
         self._batch = []
 
-        try:
-            for item in data_batch:
+        for item in data_batch:
+            try:
                 if ":" not in item:
                     raise ValueError(f"Invalid format: {item}")
                 sensor, reading = item.split(":", 1)
                 if sensor not in ["temperature", "humidity", "pressure"]:
-                    raise ValueError(f"Invalid sensor {sensor}")
+                    raise ValueError(f"Invalid sensor: {sensor}")
                 try:
                     float(reading)
                 except ValueError:
                     int(reading)
                 self._batch.append(item)
-            batch_str = ", ".join(self._batch)
-            print(f" {bold('Processing sensor batch:')} [{batch_str}]")
-            return "OK"
+            except (ValueError, TypeError, AttributeError):
+                continue
 
-        except (ValueError, TypeError, AttributeError) as e:
-            print(f" Error: Invalid element found in batch. {e}")
+        if not self._batch:
+            print(f" Error: No valid sensor data found in batch.")
             return "KO"
+
+        batch_str = ", ".join(self._batch)
+        print(f" {bold('Processing sensor batch:')} [{batch_str}]")
+        return "OK"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -122,7 +125,8 @@ class SensorStream(DataStream):
 
         thresholds = {"temperature": 800, "humidity": 850, "pressure": 900}
         if self._batch:
-            csa = len([item for item in self._batch if float(item.split(":")[1]) > threshold])
+            csa = len([item for item in self._batch
+                       if float(item.split(":")[1]) > thresholds[item.split(":")[0]]])
 
         stats = {"stream_id": stream_id,
                  "readings_processed": readings_processed,
@@ -147,8 +151,8 @@ class TransactionStream(DataStream):
         """Process a batch of data."""
         self._batch = []
         
-        try:
-            for item in data_batch:
+        for item in data_batch:
+            try:
                 if ":" not in item:
                     raise ValueError(f"Invalid format: {item}")
                 action, value_str = item.split(":", 1)
@@ -156,14 +160,17 @@ class TransactionStream(DataStream):
                     raise ValueError(f"Invalid action: {action}")
                 int(value_str)
                 self._batch.append(item)
-            batch_str = ", ".join(self._batch)
-            print(f" {bold('Processing transaction batch:')} [{batch_str}]")
-            return "OK"
-        
-        except (ValueError, TypeError, AttributeError) as e:
-            print(f" Error: Invalid element found in batch. {e}")
+            except (ValueError, TypeError, AttributeError):
+                continue
+
+        if not self._batch:
+            print(f" Error: No valid transaction data found in batch.")
             return "KO"
-            
+
+        batch_str = ", ".join(self._batch)
+        print(f" {bold('Processing transaction batch:')} [{batch_str}]")
+        return "OK"
+
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         """Filter data based on criteria."""
@@ -189,20 +196,23 @@ class EventStream(DataStream):
         """Process a batch of data."""
         self._batch = []
 
-        try:
-            for event in data_batch:
-                if not isinstance(event, str):
+        for item in data_batch:
+            try:
+                if not isinstance(item, str):
                     raise TypeError(f"Events must be str.")
-                if event not in ["error", "login", "logout"]:
-                    raise ValueError(f"Invalid event: {event}")
-                self._batch.append(event)
-            batch_str = ", ".join(self._batch)
-            print(f" {bold('Processing event batch:')} [{batch_str}]")
-            return "OK"
+                if item not in ["error", "login", "logout"]:
+                    raise ValueError(f"Invalid event: {item}")
+                self._batch.append(item)
+            except (TypeError, ValueError):
+                continue
 
-        except (TypeError, ValueError) as e:
-            print(f" Error: Invalid element found in batch. {e}")
+        if not self._batch:
+            print(f" Error: No valid event data found in batch.")
             return "KO"
+
+        batch_str = ", ".join(self._batch)
+        print(f" {bold('Processing event batch:')} [{batch_str}]")
+        return "OK"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -222,7 +232,3 @@ class StreamProcessor:
     def __init__(self) -> None:
         """..."""
         pass
-
-    def stream_analysis(self, Dict[str, Union[str, int, float]) -> None:
-        """..."""
-        print(f"")
