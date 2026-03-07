@@ -60,7 +60,10 @@ class SensorStream(DataStream):
         self._avg_humidity: float = 0.0
         self._avg_pressure: float = 0.0
         self._critical_sensor_alerts: int = 0
+        
         super().__init__(stream_id)
+        if self._stream_id:
+            self._stream_id = "SENSOR_" + self._stream_id
 
     def _parse_batch(self, data_batch: List[Any]) -> None:
         """Parse and validate batch, store valid items in self._batch."""
@@ -136,8 +139,12 @@ class TransactionStream(DataStream):
         """Print header and Stream ID format."""
         self._stream_id: str = ""
         self._operations: int = 0
-        self._net_flow: int = 0
+        self._net_flow: str = ""
+        self._large_transactions: int = 0
+        
         super().__init__(stream_id)
+        if self._stream_id:
+            self._stream_id = "TRANS_" + self._stream_id
 
     def _parse_batch(self, data_batch: List[Any]) -> None:
         """Parse and validate batch, store valid items in self._batch."""
@@ -158,8 +165,14 @@ class TransactionStream(DataStream):
     def _run_analysis(self) -> None:
         """Compute and store stats from self._batch."""
         self._operations = len(self._batch)
-        self._net_flow = sum(int(i.split(":")[1]) if "buy" in i
-                             else -int(i.split(":")[1]) for i in self._batch)
+
+        net = sum(int(i.split(":")[1]) if "buy" in i
+                  else -int(i.split(":")[1]) for i in self._batch)
+        self._net_flow = f"+{net}" if net >= 0 else f"{net}"
+
+        threshold = 750
+        self._large_transactions = len([i for i in self._batch
+                                        if int(i.split(":")[1]) > threshold])
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
@@ -182,7 +195,8 @@ class TransactionStream(DataStream):
 
         stats = {"stream_id": self._stream_id,
                  "operations": self._operations,
-                 "net_flow": self._net_flow}
+                 "net_flow": self._net_flow,
+                 "large_transactions": self._large_transactions}
 
         return stats
 
@@ -195,7 +209,10 @@ class EventStream(DataStream):
         self._stream_id: str = ""
         self._events: int = 0
         self._errors: int = 0
+        
         super().__init__(stream_id)
+        if self._stream_id:
+            self._stream_id = "EVENT_" + self._stream_id
 
     def _parse_batch(self, data_batch: List[Any]) -> None:
         """Parse and validate batch, store valid items in self._batch."""
@@ -262,22 +279,25 @@ class StreamProcessor:
         print(" Processing mixed stream types through unified interface...")
         print()
         print(" Batch 1 Results:")
+    
+        csa = 0
+        large = 0
+    
         for stream in self._streams:
             stream.process_batch(data_batch)
             stats = stream.get_stats()
             if isinstance(stream, SensorStream):
                 print(f" - Sensor data: {stats['readings_processed']} readings processed")
+                csa += stats.get('critical_sensor_alerts', 0)
             elif isinstance(stream, TransactionStream):
                 print(f" - Transaction data: {stats['operations']} operations processed")
+                large += stats.get('large_transactions', 0)
             elif isinstance(stream, EventStream):
                 print(f" - Event data: {stats['events']} events processed")
+    
         print()
         print(" Stream filtering active: High-priority data only")
-        csa = sum(s.get_stats().get('critical_sensor_alerts', 0) for s in self._streams)
-        large = sum(1 for s in self._streams
-                    if isinstance(s, TransactionStream)
-                    and s.get_stats().get('net_flow', 0) > 500)
-        print(f" Filtered results: {csa} critical sensor alerts, {large} large transaction")
+        print(f" Filtered results: {csa} critical sensor alerts, {large} large transaction(s)")
         print()
         print(" All streams processed successfully. Nexus throughput optimal.")
 
@@ -306,24 +326,24 @@ def main() -> None:
     print(" === CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
     print()
     print(" Initializing Sensor Stream...")
-    print(f" Stream ID: SENSOR_{ds['stream_id']}, Type: Environmental Data")
+    print(f" Stream ID: {ds['stream_id']}, Type: Environmental Data")
     print(f" Processing sensor batch: [{s1}]")
     print(f" Sensor analysis: {ds['readings_processed']} " +
-          f"readings processed, avg temp: {ds['avg_temperature']}")
+          f"readings processed, avg temp: {ds['avg_temperature']}°C")
     print()
     print(" Initializing Transaction Stream...")
-    print(f" Stream ID: TRANS_{dt['stream_id']}, Type: Financial Data")
+    print(f" Stream ID: {dt['stream_id']}, Type: Financial Data")
     print(f" Processing transaction batch: [{t1}]")
     print(f" Transaction analysis: {dt['operations']} operations," +
-          f"net flow: {dt['net_flow']} units")
+          f" net flow: {dt['net_flow']} units")
     print()
     print(" Initializing Event Stream...")
-    print(f" Stream ID: EVENT_{de['stream_id']}, Type: System Events")
+    print(f" Stream ID: {de['stream_id']}, Type: System Events")
     print(f" Processing event batch: [{e1}]")
     print(f" Event analysis: {de['events']} events, {de['errors']} error detected")
     print()
 
-    data_batch1 = ["temperature:45", "humidity:85", "buy:300", "sell:100",
+    data_batch1 = ["temperature:45", "humidity:85", "buy:800", "sell:100",
                    "buy:400", "buy:200", "login", "error", "logout"]
 
     sp = StreamProcessor()
