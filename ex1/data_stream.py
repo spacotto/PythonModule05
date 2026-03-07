@@ -60,8 +60,8 @@ class SensorStream(DataStream):
 
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
-        super().__init__(stream_id)
         print(bold(" Initializing Sensor Stream..."))
+        super().__init__(stream_id)
         if self._stream_id:
             print(f" {bold('Stream ID:')} SENSOR_{self._stream_id}, Type: Environmental Data")
 
@@ -80,8 +80,8 @@ class SensorStream(DataStream):
                 except ValueError:
                     int(reading)
                 self._batch.append(item)
-            reading_list = ", ".join(self._batch)
-            print(f" {bold('Processing sensor batch:')} [{reading_list}]")
+            batch_str = ", ".join(self._batch)
+            print(f" {bold('Processing sensor batch:')} [{batch_str}]")
             return "OK"
 
         except (ValueError, TypeError, AttributeError) as e:
@@ -103,14 +103,13 @@ class TransactionStream(DataStream):
 
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
-        super().__init__(stream_id)
         print(bold(" Initializing Transaction Stream..."))
+        super().__init__(stream_id)
         if self._stream_id:
             print(f" {bold('Stream ID:')} TRANS_{self._stream_id}, Type: Financial Data")
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        validated_transactions = []
         
         try:
             for item in data_batch:
@@ -120,12 +119,14 @@ class TransactionStream(DataStream):
                 if action not in ["buy", "sell"]:
                     raise ValueError(f"Invalid action: {action}")
                 int(value_str)
-                validated_transactions.append(item)
-            trans_list = ", ".join(validated_transactions)
-            return f" {bold('Processing transaction batch:')} [{trans_list}]"
+                self._batch.append(item)
+            batch_str = ", ".join(self._batch)
+            print(f" {bold('Processing transaction batch:')} [{batch_str}]")
+            return "OK"
         
         except (ValueError, TypeError, AttributeError) as e:
-            return f" Error: Invalid element found in batch. {e}"
+            print(f" Error: Invalid element found in batch. {e}")
+            return "KO"
             
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -143,14 +144,13 @@ class EventStream(DataStream):
     
     def __init__(self, stream_id: str):
         """Print header and Stream ID format."""
-        super().__init__(stream_id)
         print(bold(" Initializing Event Stream..."))
+        super().__init__(stream_id)
         if self._stream_id:
             print(f" {bold('Stream ID:')} EVENT_{self._stream_id}, Type: System Events")
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
-        valid_events = []
 
         try:
             for event in data_batch:
@@ -158,12 +158,14 @@ class EventStream(DataStream):
                     raise TypeError(f"Events must be str.")
                 if event not in ["error", "login", "logout"]:
                     raise ValueError(f"Invalid event: {event}")
-                valid_events.append(event)
-            events_str = ", ".join(valid_events)
-            return f" {bold('Processing event batch:')} [{events_str}]"
-        
+                self._batch.append(event)
+            batch_str = ", ".join(self._batch)
+            print(f" {bold('Processing event batch:')} [{batch_str}]")
+            return "OK"
+
         except (TypeError, ValueError) as e:
-            return f" Error: Invalid element found in batch. {e}"
+            print(f" Error: Invalid element found in batch. {e}")
+            return "KO"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
