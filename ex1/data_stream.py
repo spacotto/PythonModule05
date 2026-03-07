@@ -158,10 +158,8 @@ class TransactionStream(DataStream):
     def _run_analysis(self) -> None:
         """Compute and store stats from self._batch."""
         self._operations = len(self._batch)
-        self._net_flow = sum(
-            int(i.split(":")[1]) if "buy" in i
-            else -int(i.split(":")[1]) for i in self._batch
-        )
+        self._net_flow = sum(int(i.split(":")[1]) if "buy" in i
+                             else -int(i.split(":")[1]) for i in self._batch)
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
@@ -317,7 +315,7 @@ def main() -> None:
     print(f" Stream ID: TRANS_{dt['stream_id']}, Type: Financial Data")
     print(f" Processing transaction batch: [{t1}]")
     print(f" Transaction analysis: {dt['operations']} operations," +
-          f"net flow: +{dt['net_flow']} units")
+          f"net flow: {dt['net_flow']} units")
     print()
     print(" Initializing Event Stream...")
     print(f" Stream ID: EVENT_{de['stream_id']}, Type: System Events")

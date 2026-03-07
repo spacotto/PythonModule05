@@ -181,32 +181,52 @@ class CodeNexus:
             except Exception as e:
                 data_batch.extend(n.split())
                 print(" Invalid generator input (int). Testing raw input.")
-
-            # Sensor Stream Test
-            print()
-            ss = SensorStream(stream_id)
-            sensor_batch = ss.process_batch(data_batch)
-            print(f" {bold('Processing sensor batch:')} [{batch_str}]")
-
-            # Transaction Stream Test
-            print()
-            ts = TransactionStream(stream_id)
-            ts.process_batch(data_batch)
-
-            # Event Stream Test
-            print()
-            es = EventStream(stream_id)
-            es.process_batch(data_batch)
             
-            # Polymorphic test
-            sp = StreamProcessor()
+            # System Demo Setup
+            ss = SensorStream(stream_id)
+            s1 = ss.process_batch(data_batch)
+            ds = ss.get_stats()
 
+            ts = TransactionStream(stream_id)
+            t1 = ts.process_batch(data_batch)
+            dt = ts.get_stats()
+
+            es = EventStream(stream_id)
+            e1 = es.process_batch(data_batch)
+            de = es.get_stats()
+
+            # CODE NEXUS - POLYMORPHIC STREAM SYSTEM
             print()
-            print(f" {W}Polymorphic Stream Processing{O}")
+            print(bold(" CODE NEXUS: POLYMORPHIC STREAM SYSTEM"))
             div()
-            print(f" {W}Processing mixed stream types through unified interface...{O}")
+            print(bold(" Initializing Sensor Stream..."))
+            print(f" {bold('Stream ID:')} SENSOR_{ds['stream_id']}, Type: Environmental Data")
+            print(f" {bold('Processing sensor batch:')} [{s1}]")
+            print(f" {bold('Sensor analysis:')} {ds['readings_processed']}" +
+                  f" readings processed, avg temp: {ds['avg_temperature']}")
             print()
-            print(f" {W}All streams processed successfully. Nexus throughput optimal.{O}")
+            print(bold(" Initializing Transaction Stream..."))
+            print(f" {bold('Stream ID:')} TRANS_{dt['stream_id']}, Type: Financial Data")
+            print(f" {bold('Processing transaction batch:')} [{t1}]")
+            print(f" {bold('Transaction analysis:')} {dt['operations']} operations," +
+                  f" net flow: +{dt['net_flow']} units")
+            print()
+            print(" Initializing Event Stream...")
+            print(f" {bold('Stream ID:')} EVENT_{de['stream_id']}, Type: System Events")
+            print(f" {bold('Processing event batch:')} [{e1}]")
+            print(f" {bold('Event analysis:')} {de['events']} events," +
+                  f" {de['errors']} error detected")
+            print()
+
+            # Polymorphic Stream Processing 
+            sp = StreamProcessor()
+            sp.add_stream(ss)
+            sp.add_stream(ts)
+            sp.add_stream(es)
+
+            print(bold(" Polymorphic Stream Processing"))
+            div()
+            sp.display_analysis(data_batch)
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex1 — {e}{O}")
