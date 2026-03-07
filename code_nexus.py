@@ -203,7 +203,7 @@ class CodeNexus:
             print(f" {bold('Stream ID:')} SENSOR_{ds['stream_id']}, Type: Environmental Data")
             print(f" {bold('Processing sensor batch:')} [{s1}]")
             print(f" {bold('Sensor analysis:')} {ds['readings_processed']}" +
-                  f" readings processed, avg temp: {ds['avg_temperature']:.1f}")
+                  f" readings processed, avg temp: {ds['avg_temperature']:.1f}°C")
             print()
             print(bold(" Initializing Transaction Stream..."))
             print(f" {bold('Stream ID:')} TRANS_{dt['stream_id']}, Type: Financial Data")

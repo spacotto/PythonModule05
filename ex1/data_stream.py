@@ -89,13 +89,24 @@ class SensorStream(DataStream):
     def _run_analysis(self) -> None:
         """Compute and store stats from self._batch."""
         thresholds = {"temperature": 40, "humidity": 80, "pressure": 1040}
+
         self._readings_processed = len(self._batch)
-        temps = [float(i.split(":")[1]) for i in self._batch if "temperature" in i]
-        self._avg_temperature = sum(temps) / len(temps) if temps else 0.0
-        hums = [float(i.split(":")[1]) for i in self._batch if "humidity" in i]
-        self._avg_humidity = sum(hums) / len(hums) if hums else 0.0
-        press = [float(i.split(":")[1]) for i in self._batch if "pressure" in i]
-        self._avg_pressure = sum(press) / len(press) if press else 0.0
+
+        t = self.filter_data(self._batch, "temperature")
+        t_sum = sum(float(i.split(":")[1]) for i in t)
+        t_len = len(t)
+        self._avg_temperature = t_sum / t_len if t_len else 0.0
+
+        h = self.filter_data(self._batch, "humidity")
+        h_sum = sum(float(i.split(":")[1]) for i in h)
+        h_len = len(h)
+        self._avg_humidity = h_sum / h_len if h_len else 0.0
+
+        p = self.filter_data(self._batch, "pressure")
+        p_sum = sum(float(i.split(":")[1]) for i in p)
+        p_len = len(p)
+        self._avg_pressure = p_sum / p_len if p_len else 0.0
+
         self._critical_sensor_alerts = len([i for i in self._batch
                                             if float(i.split(":")[1]) >
                                             thresholds[i.split(":")[0]]])
@@ -129,8 +140,6 @@ class SensorStream(DataStream):
 
         return stats
 
-class TransactionStream(DataStream):
-    """Handles financial transaction data streams (buy/sell operations)."""
 
 class TransactionStream(DataStream):
     """Handles financial transaction data streams (buy/sell operations)."""
@@ -165,9 +174,12 @@ class TransactionStream(DataStream):
     def _run_analysis(self) -> None:
         """Compute and store stats from self._batch."""
         self._operations = len(self._batch)
-
-        net = sum(int(i.split(":")[1]) if "buy" in i
-                  else -int(i.split(":")[1]) for i in self._batch)
+        
+        buys = self.filter_data(self._batch, "buy")
+        sells = self.filter_data(self._batch, "sell")
+        total_buys = sum(int(i.split(":")[1]) for i in buys)
+        total_sells = sum(int(i.split(":")[1]) for i in sells)
+        net = total_buys - total_sells
         self._net_flow = f"+{net}" if net >= 0 else f"{net}"
 
         threshold = 750
@@ -231,7 +243,7 @@ class EventStream(DataStream):
     def _run_analysis(self) -> None:
         """Compute and store stats from self._batch."""
         self._events = len(self._batch)
-        self._errors = len([i for i in self._batch if i == "error"])
+        self._errors = len(self.filter_data(self._batch, "error"))
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
@@ -264,28 +276,35 @@ class StreamProcessor:
     through a unified polymorphic interface."""
 
     def __init__(self) -> None:
-        self._streams: List[DataStream] = []
+        self._manager: Dict[str, Any] = {}
 
     def add_stream(self, stream: DataStream) -> None:
         """Add a stream to the processor."""
-        self._streams.append(stream)
+        stats = stream.get_stats()
+        self._manager[stats['stream_id']] = {"stream": stream, "stats": stats}
 
     def process_stream(self, stream: DataStream, batch: List[Any]) -> str:
         """Process a single stream with the given batch."""
-        return stream.process_batch(batch)
+        result = stream.process_batch(batch)
+        stats = stream.get_stats()
+        self._manager[stats['stream_id']] = {"stream": stream, "stats": stats}
+        return result
 
     def display_analysis(self, data_batch: List[Any]) -> None:
         """Process all streams and print unified report."""
         print(" Processing mixed stream types through unified interface...")
         print()
         print(" Batch 1 Results:")
-    
+
         csa = 0
         large = 0
-    
-        for stream in self._streams:
+
+        for stream_id, entry in self._manager.items():
+            stream = entry["stream"]
             stream.process_batch(data_batch)
             stats = stream.get_stats()
+            self._manager[stream_id]["stats"] = stats  # update stats after processing
+
             if isinstance(stream, SensorStream):
                 print(f" - Sensor data: {stats['readings_processed']} readings processed")
                 csa += stats.get('critical_sensor_alerts', 0)
@@ -294,7 +313,7 @@ class StreamProcessor:
                 large += stats.get('large_transactions', 0)
             elif isinstance(stream, EventStream):
                 print(f" - Event data: {stats['events']} events processed")
-    
+
         print()
         print(" Stream filtering active: High-priority data only")
         print(f" Filtered results: {csa} critical sensor alerts, {large} large transaction(s)")
