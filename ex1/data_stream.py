@@ -101,19 +101,12 @@ class SensorStream(DataStream):
 class TransactionStream(DataStream):
     """Handles financial transaction data streams (buy/sell operations)."""
 
-    def __init__(self, stream_id: str):
+    def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
         super().__init__(stream_id)
-
         print(bold(" Initializing Transaction Stream..."))
-        try:
-            num = int(self.stream_id)
-            if num < 1 or num > 100:
-                raise ValueError(f"Stream ID must be between 1 and 100")
-            n = f"{num:03d}"
+        if self._stream_id:
             print(f" {bold('Stream ID:')} TRANS_{n}, Type: Financial Data")
-        except ValueError as e:
-            print(f" {e}")
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
@@ -147,20 +140,15 @@ class TransactionStream(DataStream):
 
 class EventStream(DataStream):
     """Handles system event data streams (login, logout, errors)."""
-
+    
     def __init__(self, stream_id: str):
+    """Print header and Stream ID format."""
+        super().__init__(stream_id)
+        print(bold(" Initializing Event Stream..."))
+        if self._stream_id:
+            print(f" {bold('Stream ID:')} EVENT_{n}, Type: System Events")
         """Print header and Stream ID format."""
         super().__init__(stream_id)
-
-        print(bold(" Initializing Event Stream..."))
-        try:
-            num = int(self.stream_id)
-            if num < 1 or num > 100:
-                raise ValueError(f"Stream ID must be between 1 and 100")
-            n = f"{num:03d}"
-            print(f" {bold('Stream ID:')} EVENT_{n}, Type: System Events")
-        except ValueError as e:
-            print(f" {e}")
 
     def process_batch(self, data_batch: List[Any]) -> str:
         """Process a batch of data."""
