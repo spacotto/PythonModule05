@@ -243,13 +243,45 @@ class EventStream(DataStream):
 
         return stats
 
+
 class StreamProcessor:
     """Manages and processes multiple stream types
     through a unified polymorphic interface."""
 
     def __init__(self) -> None:
-        """..."""
-        pass
+        self._streams: List[DataStream] = []
+
+    def add_stream(self, stream: DataStream) -> None:
+        """Add a stream to the processor."""
+        self._streams.append(stream)
+
+    def process_stream(self, stream: DataStream, batch: List[Any]) -> str:
+        """Process a single stream with the given batch."""
+        return stream.process_batch(batch)
+
+    def display_analysis(self, data_batch: List[Any]) -> None:
+        """Process all streams and print unified report."""
+        print(" Processing mixed stream types through unified interface...")
+        print()
+        print(" Batch 1 Results:")
+        for stream in self._streams:
+            stream.process_batch(data_batch)
+            stats = stream.get_stats()
+            if isinstance(stream, SensorStream):
+                print(f" - Sensor data: {stats['readings_processed']} readings processed")
+            elif isinstance(stream, TransactionStream):
+                print(f" - Transaction data: {stats['operations']} operations processed")
+            elif isinstance(stream, EventStream):
+                print(f" - Event data: {stats['events']} events processed")
+        print()
+        print(" Stream filtering active: High-priority data only")
+        csa = sum(s.get_stats().get('critical_sensor_alerts', 0) for s in self._streams)
+        large = sum(1 for s in self._streams
+                    if isinstance(s, TransactionStream)
+                    and s.get_stats().get('net_flow', 0) > 500)
+        print(f" Filtered results: {csa} critical sensor alerts, {large} large transaction")
+        print()
+        print(" All streams processed successfully. Nexus throughput optimal.")
 
 
 def main() -> None:
@@ -292,21 +324,17 @@ def main() -> None:
     print(f" Processing event batch: [{e1}]")
     print(f" Event analysis: {de['events']} events, {de['errors']} error detected")
     print()
-    
-    data_batch1 = []
+
+    data_batch1 = ["temperature:45", "humidity:85", "buy:300", "sell:100",
+                   "buy:400", "buy:200", "login", "error", "logout"]
+
+    sp = StreamProcessor()
+    sp.add_stream(ss)
+    sp.add_stream(ts)
+    sp.add_stream(es)
 
     print(" === Polymorphic Stream Processing ===")
-    print(" Processing mixed stream types through unified interface...")
-    print()
-    print(" Batch 1 Results:")
-    print(" - Sensor data: 2 readings processed")
-    print(" - Transaction data: 4 operations processed")
-    print(" - Event data: 3 events processed")
-    print()
-    print(" Stream filtering active: High-priority data only")
-    print(" Filtered results: 2 critical sensor alerts, 1 large transaction")
-    print()
-    print(" All streams processed successfully. Nexus throughput optimal.")
+    sp.display_analysis(data_batch1)
 
 
 if __name__ == "__main__":
