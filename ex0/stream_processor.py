@@ -156,7 +156,7 @@ class LogProcessor(DataProcessor):
             result = f"{log_prefix} level detected: {message}"
         except (TypeError, AttributeError, InvalidLogFormatError) as e:
             result = f"{e}"
-            
+
         return result
 
     def validate(self, data: Any) -> bool:
@@ -180,3 +180,49 @@ class LogProcessor(DataProcessor):
     def format_output(self, result: str) -> str:
         """Custom formatting to add the ALERT prefix for logs."""
         return f" {bold('Output:')} {result}"
+
+
+def main() -> None:
+    """Exercise 0 Demo"""
+
+    n1: list = [1, 2, 3, 4, 5]
+    n2: list = [1, 2, 3]
+
+    t1: str = "Hello Nexus World"
+    t2: str = "Hello World!"
+
+    l1: str = "ERROR: Connection timeout"
+    l2: str = "INFO: System ready"
+
+    print(" === CODE NEXUS - DATA PROCESSOR FOUNDATION ===")
+
+    print()
+    np = NumericProcessor(n1)
+    result = np.process(n1)
+    np.validate(n1)
+    print(np.format_output(result))
+
+    print()
+    tp = TextProcessor(t1)
+    result = tp.process(t1)
+    tp.validate(t1)
+    print(tp.format_output(result))
+
+    print()
+    lp = LogProcessor(l1)
+    result = lp.process(l1)
+    lp.validate(l1)
+    print(lp.format_output(result))
+
+    print()
+    print(" === Polymorphic Processing Demo ===")
+    print(" Processing multiple data types through same interface...")
+    print(f" Result 1: {np.process(n2)}")
+    print(f" Result 2: {tp.process(t2)}")
+    print(f" Result 3: {lp.process(l2)}")
+    print()
+    print(" Foundation systems online. Nexus ready for advanced streams.")
+
+
+if __name__ == "__main__":
+    main()
