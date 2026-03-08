@@ -136,7 +136,7 @@ class CodeNexus:
             # Initialise the batch of data where all gen data will be stored
             data_batch: list = []
 
-            # Collect and add data for Sensor Stream 
+            # Collect and add data for Sensor Stream
             valid_sensors: list = ["temperature", "humidity", "pressure"]
             s = input(f" {W}Sensor Data: How many entries?{O} ")
 
@@ -155,7 +155,7 @@ class CodeNexus:
                 data_batch.extend(s.split())
                 print(" Invalid generator input (int). Testing raw input.")
 
-            # Collect and add data for Transaction Stream            
+            # Collect and add data for Transaction Stream
             valid_trans: list = ["buy", "sell"]
             t = input(f" {W}Transaction Data: How many entries?{O} ")
 
@@ -181,7 +181,7 @@ class CodeNexus:
             except Exception as e:
                 data_batch.extend(n.split())
                 print(" Invalid generator input (int). Testing raw input.")
-            
+
             # System Demo Setup
             ss = SensorStream(stream_id)
             s1 = ss.process_batch(data_batch)
@@ -218,7 +218,7 @@ class CodeNexus:
                   f" {de['errors']} error detected")
             print()
 
-            # Polymorphic Stream Processing 
+            # Polymorphic Stream Processing
             sp = StreamProcessor()
             sp.add_stream(ss)
             sp.add_stream(ts)

@@ -41,7 +41,8 @@ class DataStream(ABC):
         if criteria is None:
             return data_batch
         keywords = criteria.split()
-        return [data for data in data_batch if any(k in data for k in keywords)]
+        return [data for data in data_batch
+                if any(k in data for k in keywords)]
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
@@ -60,7 +61,7 @@ class SensorStream(DataStream):
         self._avg_humidity: float = 0.0
         self._avg_pressure: float = 0.0
         self._critical_sensor_alerts: int = 0
-        
+
         super().__init__(stream_id)
         if self._stream_id:
             self._stream_id = "SENSOR_" + self._stream_id
@@ -70,7 +71,7 @@ class SensorStream(DataStream):
         self._batch = []
 
         for item in data_batch:
-        
+
             try:
                 if ":" not in item:
                     raise ValueError(f"Invalid format: {item}")
@@ -115,7 +116,7 @@ class SensorStream(DataStream):
         """Process a batch of data."""
         self._parse_batch(data_batch)
         if not self._batch:
-            print(f" Error: No valid sensor data found in batch.")
+            print(" Error: No valid sensor data found in batch.")
             return ""
         self._run_analysis()
         batch_str = ", ".join(self._batch)
@@ -150,7 +151,7 @@ class TransactionStream(DataStream):
         self._operations: int = 0
         self._net_flow: str = ""
         self._large_transactions: int = 0
-        
+
         super().__init__(stream_id)
         if self._stream_id:
             self._stream_id = "TRANS_" + self._stream_id
@@ -174,7 +175,7 @@ class TransactionStream(DataStream):
     def _run_analysis(self) -> None:
         """Compute and store stats from self._batch."""
         self._operations = len(self._batch)
-        
+
         buys = self.filter_data(self._batch, "buy")
         sells = self.filter_data(self._batch, "sell")
         total_buys = sum(int(i.split(":")[1]) for i in buys)
@@ -190,7 +191,7 @@ class TransactionStream(DataStream):
         """Process a batch of data."""
         self._parse_batch(data_batch)
         if not self._batch:
-            print(f" Error: No valid transaction data found in batch.")
+            print(" Error: No valid transaction data found in batch.")
             return ""
         self._run_analysis()
         batch_str = ", ".join(self._batch)
@@ -221,7 +222,7 @@ class EventStream(DataStream):
         self._stream_id: str = ""
         self._events: int = 0
         self._errors: int = 0
-        
+
         super().__init__(stream_id)
         if self._stream_id:
             self._stream_id = "EVENT_" + self._stream_id
@@ -233,7 +234,7 @@ class EventStream(DataStream):
         for item in data_batch:
             try:
                 if not isinstance(item, str):
-                    raise TypeError(f"Events must be str.")
+                    raise TypeError("Events must be str.")
                 if item not in ["error", "login", "logout"]:
                     raise ValueError(f"Invalid event: {item}")
                 self._batch.append(item)
@@ -249,7 +250,7 @@ class EventStream(DataStream):
         """Process a batch of data."""
         self._parse_batch(data_batch)
         if not self._batch:
-            print(f" Error: No valid event data found in batch.")
+            print(" Error: No valid event data found in batch.")
             return ""
         self._run_analysis()
         batch_str = ", ".join(self._batch)
@@ -303,20 +304,23 @@ class StreamProcessor:
             stream = entry["stream"]
             stream.process_batch(data_batch)
             stats = stream.get_stats()
-            self._manager[stream_id]["stats"] = stats  # update stats after processing
+            self._manager[stream_id]["stats"] = stats
 
             if isinstance(stream, SensorStream):
-                print(f" - Sensor data: {stats['readings_processed']} readings processed")
+                print(f" - Sensor data: {stats['readings_processed']} i" +
+                      "readings processed")
                 csa += stats.get('critical_sensor_alerts', 0)
             elif isinstance(stream, TransactionStream):
-                print(f" - Transaction data: {stats['operations']} operations processed")
+                print(f" - Transaction data: {stats['operations']}" +
+                      " operations processed")
                 large += stats.get('large_transactions', 0)
             elif isinstance(stream, EventStream):
                 print(f" - Event data: {stats['events']} events processed")
 
         print()
         print(" Stream filtering active: High-priority data only")
-        print(f" Filtered results: {csa} critical sensor alerts, {large} large transaction(s)")
+        print(f" Filtered results: {csa} critical sensor alerts," +
+              f"{large} large transaction(s)")
         print()
         print(" All streams processed successfully. Nexus throughput optimal.")
 
@@ -325,10 +329,10 @@ def main() -> None:
     """Exercise 1 Demo"""
 
     stream_id = "1"
-    
+
     data_batch0 = ["temperature:22.5", "humidity:65", "pressure:1013",
-                  "buy:100", "sell:150", "buy:75",
-                  "login", "error", "logout"]
+                   "buy:100", "sell:150", "buy:75",
+                   "login", "error", "logout"]
 
     ss = SensorStream(stream_id)
     s1 = ss.process_batch(data_batch0)
@@ -359,7 +363,8 @@ def main() -> None:
     print(" Initializing Event Stream...")
     print(f" Stream ID: {de['stream_id']}, Type: System Events")
     print(f" Processing event batch: [{e1}]")
-    print(f" Event analysis: {de['events']} events, {de['errors']} error detected")
+    print(f" Event analysis: {de['events']} events," +
+          f" {de['errors']} error detected")
     print()
 
     data_batch1 = ["temperature:45", "humidity:85", "buy:800", "sell:100",
