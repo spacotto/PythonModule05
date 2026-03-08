@@ -23,7 +23,6 @@ class InvalidLogFormatError(Exception):
     """Raised when log data doesn't match expected format."""
     def __init__(self) -> None:
         self.message = "Invalid log format. Try: ERROR/INFO: Message."
-        super().__init__(self.message)
 
 
 class DataProcessor(ABC):
@@ -71,6 +70,8 @@ class NumericProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         """Checks if the input is a list of integers."""
+        result = "Validation failed"
+
         try:
             data_list = list(data)
             try:
@@ -89,7 +90,7 @@ class NumericProcessor(DataProcessor):
 
     def format_output(self, result: str) -> str:
         """Overrides base method to match the requested output style."""
-        return f" {bold('Output:')} {result}"
+        return super().format_output(result)
 
 
 class TextProcessor(DataProcessor):
@@ -114,6 +115,8 @@ class TextProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         """Checks if the input is a non-empty string."""
+        result = "Validation failed"
+
         try:
             str(data)
             result = "Text data verified"
@@ -126,7 +129,7 @@ class TextProcessor(DataProcessor):
 
     def format_output(self, result: str) -> str:
         """Formats the final output string."""
-        return f" {bold('Output:')} {result}"
+        return super().format_output(result)
 
 
 class LogProcessor(DataProcessor):
@@ -161,6 +164,8 @@ class LogProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         """Checks if the input is a string containing a colon."""
+        result = "Validation failed"
+
         try:
             str(data)
             parts = data.split(":", 1)
@@ -179,7 +184,7 @@ class LogProcessor(DataProcessor):
 
     def format_output(self, result: str) -> str:
         """Custom formatting to add the ALERT prefix for logs."""
-        return f" {bold('Output:')} {result}"
+        return super().format_output(result)
 
 
 def main() -> None:
