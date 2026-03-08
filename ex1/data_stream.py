@@ -320,7 +320,7 @@ class StreamProcessor:
         print()
         print(" Stream filtering active: High-priority data only")
         print(f" Filtered results: {csa} critical sensor alerts," +
-              f"{large} large transaction(s)")
+              f" {large} large transaction(s)")
         print()
         print(" All streams processed successfully. Nexus throughput optimal.")
 
