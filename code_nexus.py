@@ -62,16 +62,12 @@ class CodeNexus:
             # Collect data for Numeric Processor
             raw = input(f" {W}Enter numbers separated by spaces: {O}")
             numeric: list = raw.split()
-            numeric1: list = [1, 2, 3]
 
             # Collect data for Text Processor
             text = input(f" {W}Enter a text string: {O}")
-            text1 = "Hello World!"
 
             # Test str for Log Processor
             log = input(f" {W}Enter log (format: ERROR/INFO: Msg): {O}")
-            # log_err = "ERROR: Connection timeout"
-            log_info = "INFO: System ready"
 
             # Numeric Processor Test
             print()
@@ -98,16 +94,15 @@ class CodeNexus:
             print()
             print(f" {W}Polymorphic Processing Demo{O}")
             div()
-            print(f" {W}Processing multiple data types through same interface...{O}")  # noqa: E501
-            r1 = np.process(numeric1)
-            print(f" {W}Result 1:{O} {r1}")
-            r2 = tp.process(text1)
-            print(f" {W}Result 2:{O} {r2}")
-            r3 = lp.process(log_info)
-            print(f" {W}Result 3:{O} {r3}")
+            print(f" {W}Processing multiple data types" +
+                  f" through same interface...{O}")
+            print(f" {W}Result 1:{O} {np.process(numeric)}")
+            print(f" {W}Result 2:{O} {tp.process(text)}")
+            print(f" {W}Result 3:{O} {lp.process(log)}")
 
             print()
-            print(f" {W}Foundation systems online. Nexus ready for advanced streams.{O}")  # noqa: E501
+            print(f" {W}Foundation systems online." +
+                  f" Nexus ready for advanced streams.{O}")
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex0 — {e}{O}")
@@ -153,6 +148,7 @@ class CodeNexus:
 
             except Exception as e:
                 data_batch.extend(s.split())
+                print(f" {e}")
                 print(" Invalid generator input (int). Testing raw input.")
 
             # Collect and add data for Transaction Stream
@@ -167,11 +163,11 @@ class CodeNexus:
 
             except Exception as e:
                 data_batch.extend(t.split())
+                print(f" {e}")
                 print(" Invalid generator input (int). Testing raw input.")
 
             # Collect and add data for Event Stream
             valid_events: list = ["error", "login", "logout"]
-            events = []
             n = input(f" {W}Event Data: How many entries?{O} ")
 
             try:
@@ -180,6 +176,7 @@ class CodeNexus:
 
             except Exception as e:
                 data_batch.extend(n.split())
+                print(f" {e}")
                 print(" Invalid generator input (int). Testing raw input.")
 
             # System Demo Setup
@@ -200,19 +197,23 @@ class CodeNexus:
             print(bold(" CODE NEXUS: POLYMORPHIC STREAM SYSTEM"))
             div()
             print(bold(" Initializing Sensor Stream..."))
-            print(f" {bold('Stream ID:')} SENSOR_{ds['stream_id']}, Type: Environmental Data")
+            print(f" {bold('Stream ID:')} {ds['stream_id']}," +
+                  " Type: Environmental Data")
             print(f" {bold('Processing sensor batch:')} [{s1}]")
             print(f" {bold('Sensor analysis:')} {ds['readings_processed']}" +
-                  f" readings processed, avg temp: {ds['avg_temperature']:.1f}°C")
+                  f" readings processed, avg temp: {ds['avg_temperature']:.1f}°C")  # noqa: E501
             print()
             print(bold(" Initializing Transaction Stream..."))
-            print(f" {bold('Stream ID:')} TRANS_{dt['stream_id']}, Type: Financial Data")
+            print(f" {bold('Stream ID:')} {dt['stream_id']}," +
+                  " Type: Financial Data")
             print(f" {bold('Processing transaction batch:')} [{t1}]")
-            print(f" {bold('Transaction analysis:')} {dt['operations']} operations," +
+            print(f" {bold('Transaction analysis:')}" +
+                  f" {dt['operations']} operations," +
                   f" net flow: {dt['net_flow']} units")
             print()
-            print(" Initializing Event Stream...")
-            print(f" {bold('Stream ID:')} EVENT_{de['stream_id']}, Type: System Events")
+            print(bold(" Initializing Event Stream..."))
+            print(f" {bold('Stream ID:')} {de['stream_id']}," +
+                  " Type: System Events")
             print(f" {bold('Processing event batch:')} [{e1}]")
             print(f" {bold('Event analysis:')} {de['events']} events," +
                   f" {de['errors']} error detected")
