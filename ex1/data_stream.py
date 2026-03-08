@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Exercise 1: Polymorphic Streams
 
