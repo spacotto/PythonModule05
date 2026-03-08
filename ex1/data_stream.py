@@ -130,8 +130,6 @@ class SensorStream(DataStream):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-        stats: dict = {}
-
         stats = {"stream_id": self._stream_id,
                  "readings_processed": self._readings_processed,
                  "avg_temperature": self._avg_temperature,
@@ -204,8 +202,6 @@ class TransactionStream(DataStream):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-        stats: dict = {}
-
         stats = {"stream_id": self._stream_id,
                  "operations": self._operations,
                  "net_flow": self._net_flow,
@@ -263,8 +259,6 @@ class EventStream(DataStream):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         """Return stream statistics."""
-        stats: dict = {}
-
         stats = {"stream_id": self._stream_id,
                  "events": self._events,
                  "errors": self._errors}
@@ -284,13 +278,6 @@ class StreamProcessor:
         stats = stream.get_stats()
         self._manager[stats['stream_id']] = {"stream": stream, "stats": stats}
 
-    def process_stream(self, stream: DataStream, batch: List[Any]) -> str:
-        """Process a single stream with the given batch."""
-        result = stream.process_batch(batch)
-        stats = stream.get_stats()
-        self._manager[stats['stream_id']] = {"stream": stream, "stats": stats}
-        return result
-
     def display_analysis(self, data_batch: List[Any]) -> None:
         """Process all streams and print unified report."""
         print(" Processing mixed stream types through unified interface...")
@@ -307,7 +294,7 @@ class StreamProcessor:
             self._manager[stream_id]["stats"] = stats
 
             if isinstance(stream, SensorStream):
-                print(f" - Sensor data: {stats['readings_processed']} i" +
+                print(f" - Sensor data: {stats['readings_processed']} " +
                       "readings processed")
                 csa += stats.get('critical_sensor_alerts', 0)
             elif isinstance(stream, TransactionStream):
