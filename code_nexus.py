@@ -22,12 +22,6 @@ W = "\033[1;97m"
 O = "\033[0m"  # noqa: E741
 
 
-def bold(text: str) -> str:
-    """A function making strings of text bold."""
-    w, r = "\033[1;97m", "\033[0m"
-    return f"{w}{text}{r}"
-
-
 def div() -> None:
     """Prints a line divider."""
     print(" " + "-" * 60)
@@ -233,25 +227,10 @@ class CodeNexus:
             print(f" {W}Exercise 2 - Nexus Integration{O}")
             div()
 
-            manager = NexusManager()
-            manager.add_pipeline(JSONAdapter("JSON_01"))
-            manager.add_pipeline(CSVAdapter("CSV_01"))
-            manager.add_pipeline(StreamAdapter("STREAM_01"))
-
-            test_data = [
-                '{"sensor": "temp", "value": 23.5, "unit": "C"}',
-                "user,action,timestamp",
-                ["22.1", "21.9", "22.5", "22.3", "21.8"],
-            ]
-
-            for data in test_data:
-                print()
-                print(manager.process_data(data))
-
-            print()
-            div()
-            print(f" {G}✅ Exercise 2 complete!{O}")
-            div()
+        # Collect data
+        json_data = input(f" {W}Enter JSON data: {O}")
+        csv_data = input(f" {W}Enter CSV data: {O}")
+        stream_data = input(f" {W}Enter Stream data: {O}")
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex2 — {e}{O}")
