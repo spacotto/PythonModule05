@@ -98,7 +98,6 @@ class NexusManager:
         print(" Initializing Nexus Manager...")
         print(" Pipeline capacity: 1000 streams/second")
 
-
     def add_pipeline(self, pipeline: ProcessingPipeline) -> None:
         self.pipelines.append(pipeline)
 
@@ -169,6 +168,7 @@ def main() -> None:
     print(' Recovery successful: Pipeline restored, processing resumed')
     print()
     print(' Nexus Integration complete. All systems operational')
+
 
 if __name__ == "__main__":
     main()

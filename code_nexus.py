@@ -185,20 +185,20 @@ class CodeNexus:
             div()
 
             ss = SensorStream(stream_id)
-            s1 = ss.process_batch(data_batch)
-            ds = ss.get_stats()
+            ss.process_batch(data_batch)
+            ss.get_stats()
             ss.display_stats()
             print()
 
             ts = TransactionStream(stream_id)
-            t1 = ts.process_batch(data_batch)
-            dt = ts.get_stats()
+            ts.process_batch(data_batch)
+            ts.get_stats()
             ts.display_stats()
             print()
 
             es = EventStream(stream_id)
-            e1 = es.process_batch(data_batch)
-            de = es.get_stats()
+            es.process_batch(data_batch)
+            es.get_stats()
             es.display_stats()
             print()
 

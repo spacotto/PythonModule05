@@ -238,13 +238,13 @@ class TransactionStream(DataStream):
     def display_stats(self) -> None:
         """Display class stats."""
         batch: str = ", ".join(self._batch)
-        print(f" {bold('Stream ID:')}" + 
+        print(f" {bold('Stream ID:')}" +
               f" {self._stream_id}, Type: Financial Data")
         print(f" {bold('Processing transaction batch:')} [{batch}]")
         print(f" {bold('Transaction analysis:')}" +
               f" {self._operations} operations," +
               f" net flow: {self._net_flow} units")
-    
+
 
 class EventStream(DataStream):
     """Handles system event data streams (login, logout, errors)."""
@@ -370,22 +370,22 @@ def main() -> None:
 
     print(" === CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
     print()
-    
+
     ss = SensorStream(stream_id)
-    s1 = ss.process_batch(data_batch0)
-    ds = ss.get_stats()
+    ss.process_batch(data_batch0)
+    ss.get_stats()
     ss.display_stats()
     print()
 
     ts = TransactionStream(stream_id)
-    t1 = ts.process_batch(data_batch0)
-    dt = ts.get_stats()
+    ts.process_batch(data_batch0)
+    ts.get_stats()
     ts.display_stats()
     print()
 
     es = EventStream(stream_id)
-    e1 = es.process_batch(data_batch0)
-    de = es.get_stats()
+    es.process_batch(data_batch0)
+    es.get_stats()
     es.display_stats()
     print()
 
