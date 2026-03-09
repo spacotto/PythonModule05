@@ -161,7 +161,7 @@ class SensorStream(DataStream):
         print(f" {bold('Processing sensor batch:')} [{batch}]")
         print(f" {bold('Sensor analysis:')}" +
               f" {self._readings_processed} readings processed," +
-              f" avg temp: {self._avg_temperature:.1f}°C")
+              f" avg temperature: {self._avg_temperature:.1f}°C")
 
 
 class TransactionStream(DataStream):
