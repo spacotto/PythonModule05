@@ -25,6 +25,7 @@ class InvalidLogFormatError(Exception):
     """Raised when log data doesn't match expected format."""
     def __init__(self) -> None:
         self.message = "Invalid log format. Try: ERROR/INFO: Message."
+        super().__init__(self.message)
 
 
 class DataProcessor(ABC):
