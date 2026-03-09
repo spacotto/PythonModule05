@@ -13,6 +13,12 @@ from abc import ABC, abstractmethod
 from typing import Any, List, Dict, Union, Optional  # noqa: F401
 
 
+def bold(text: str) -> str:
+    """A function making strings of text bold."""
+    w, r = "\033[1;97m", "\033[0m"
+    return f"{w}{text}{r}"
+
+
 class DataStream(ABC):
     """An abstract base class with core streaming functionality."""
 
@@ -50,6 +56,10 @@ class DataStream(ABC):
         """Return stream statistics."""
         return {"stream_id": self._stream_id}
 
+    def display_stats(self) -> None:
+        """Display class stats."""
+        pass
+
 
 class SensorStream(DataStream):
     """Handles environmental sensor data streams
@@ -57,6 +67,8 @@ class SensorStream(DataStream):
 
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
+        print(bold(" Initializing Sensor Stream..."))
+
         self._stream_id: str = ""
         self._readings_processed: int = 0
         self._avg_temperature: float = 0.0
@@ -141,12 +153,24 @@ class SensorStream(DataStream):
 
         return stats
 
+    def display_stats(self) -> None:
+        """Display class stats."""
+        batch: str = ", ".join(self._batch)
+        print(f" {bold('Stream ID:')}" +
+              f" {self._stream_id}, Type: Environmental Data")
+        print(f" {bold('Processing sensor batch:')} [{batch}]")
+        print(f" {bold('Sensor analysis:')}" +
+              f" {self._readings_processed} readings processed," +
+              f" avg temp: {self._avg_temperature:.1f}°C")
+
 
 class TransactionStream(DataStream):
     """Handles financial transaction data streams (buy/sell operations)."""
 
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
+        print(bold(" Initializing Transaction Stream..."))
+
         self._stream_id: str = ""
         self._operations: int = 0
         self._net_flow: str = ""
@@ -211,12 +235,24 @@ class TransactionStream(DataStream):
 
         return stats
 
+    def display_stats(self) -> None:
+        """Display class stats."""
+        batch: str = ", ".join(self._batch)
+        print(f" {bold('Stream ID:')}" + 
+              f" {self._stream_id}, Type: Financial Data")
+        print(f" {bold('Processing transaction batch:')} [{batch}]")
+        print(f" {bold('Transaction analysis:')}" +
+              f" {self._operations} operations," +
+              f" net flow: {self._net_flow} units")
+    
 
 class EventStream(DataStream):
     """Handles system event data streams (login, logout, errors)."""
 
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
+        print(bold(" Initializing Event Stream..."))
+
         self._stream_id: str = ""
         self._events: int = 0
         self._errors: int = 0
@@ -267,6 +303,14 @@ class EventStream(DataStream):
 
         return stats
 
+    def display_stats(self) -> None:
+        """Display class stats."""
+        batch: str = ", ".join(self._batch)
+        print(f" {bold('Stream ID:')} {self._stream_id}, Type: System Events")
+        print(f" {bold('Processing event batch:')} [{batch}]")
+        print(f" {bold('Event analysis:')} {self._events} events," +
+              f" {self._errors} error detected")
+
 
 class StreamProcessor:
     """Manages and processes multiple stream types
@@ -284,7 +328,7 @@ class StreamProcessor:
         """Process all streams and print unified report."""
         print(" Processing mixed stream types through unified interface...")
         print()
-        print(" Batch 1 Results:")
+        print(bold(" Batch 1 Results:"))
 
         csa = 0
         large = 0
@@ -296,19 +340,20 @@ class StreamProcessor:
             self._manager[stream_id]["stats"] = stats
 
             if isinstance(stream, SensorStream):
-                print(f" - Sensor data: {stats['readings_processed']} " +
-                      "readings processed")
+                print(f" {bold('- Sensor data:')}" +
+                      f" {stats['readings_processed']} readings processed")
                 csa += stats.get('critical_sensor_alerts', 0)
             elif isinstance(stream, TransactionStream):
-                print(f" - Transaction data: {stats['operations']}" +
-                      " operations processed")
+                print(f" {bold('- Transaction data:')}" +
+                      f" {stats['operations']} operations processed")
                 large += stats.get('large_transactions', 0)
             elif isinstance(stream, EventStream):
-                print(f" - Event data: {stats['events']} events processed")
+                print(f" {bold('- Event data:')}" +
+                      f" {stats['events']} events processed")
 
         print()
-        print(" Stream filtering active: High-priority data only")
-        print(f" Filtered results: {csa} critical sensor alerts," +
+        print(f" {bold('Stream filtering active:')} High-priority data only")
+        print(f" {bold('Filtered results:')} {csa} critical sensor alerts," +
               f" {large} large transaction(s)")
         print()
         print(" All streams processed successfully. Nexus throughput optimal.")
@@ -323,37 +368,25 @@ def main() -> None:
                    "buy:100", "sell:150", "buy:75",
                    "login", "error", "logout"]
 
+    print(" === CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
+    print()
+    
     ss = SensorStream(stream_id)
     s1 = ss.process_batch(data_batch0)
     ds = ss.get_stats()
+    ss.display_stats()
+    print()
 
     ts = TransactionStream(stream_id)
     t1 = ts.process_batch(data_batch0)
     dt = ts.get_stats()
+    ts.display_stats()
+    print()
 
     es = EventStream(stream_id)
     e1 = es.process_batch(data_batch0)
     de = es.get_stats()
-
-    print(" === CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
-    print()
-    print(" Initializing Sensor Stream...")
-    print(f" Stream ID: {ds['stream_id']}, Type: Environmental Data")
-    print(f" Processing sensor batch: [{s1}]")
-    print(f" Sensor analysis: {ds['readings_processed']} " +
-          f"readings processed, avg temp: {ds['avg_temperature']}°C")
-    print()
-    print(" Initializing Transaction Stream...")
-    print(f" Stream ID: {dt['stream_id']}, Type: Financial Data")
-    print(f" Processing transaction batch: [{t1}]")
-    print(f" Transaction analysis: {dt['operations']} operations," +
-          f" net flow: {dt['net_flow']} units")
-    print()
-    print(" Initializing Event Stream...")
-    print(f" Stream ID: {de['stream_id']}, Type: System Events")
-    print(f" Processing event batch: [{e1}]")
-    print(f" Event analysis: {de['events']} events," +
-          f" {de['errors']} error detected")
+    es.display_stats()
     print()
 
     data_batch1 = ["temperature:45", "humidity:85", "buy:800", "sell:100",

@@ -179,44 +179,27 @@ class CodeNexus:
                 print(f" {e}")
                 print(" Invalid generator input (int). Testing raw input.")
 
-            # System Demo Setup
+            # System Demo
+            print()
+            print(bold(" CODE NEXUS: POLYMORPHIC STREAM SYSTEM"))
+            div()
+
             ss = SensorStream(stream_id)
             s1 = ss.process_batch(data_batch)
             ds = ss.get_stats()
+            ss.display_stats()
+            print()
 
             ts = TransactionStream(stream_id)
             t1 = ts.process_batch(data_batch)
             dt = ts.get_stats()
+            ts.display_stats()
+            print()
 
             es = EventStream(stream_id)
             e1 = es.process_batch(data_batch)
             de = es.get_stats()
-
-            # CODE NEXUS - POLYMORPHIC STREAM SYSTEM
-            print()
-            print(bold(" CODE NEXUS: POLYMORPHIC STREAM SYSTEM"))
-            div()
-            print(bold(" Initializing Sensor Stream..."))
-            print(f" {bold('Stream ID:')} {ds['stream_id']}," +
-                  " Type: Environmental Data")
-            print(f" {bold('Processing sensor batch:')} [{s1}]")
-            print(f" {bold('Sensor analysis:')} {ds['readings_processed']}" +
-                  f" readings processed, avg temp: {ds['avg_temperature']:.1f}°C")  # noqa: E501
-            print()
-            print(bold(" Initializing Transaction Stream..."))
-            print(f" {bold('Stream ID:')} {dt['stream_id']}," +
-                  " Type: Financial Data")
-            print(f" {bold('Processing transaction batch:')} [{t1}]")
-            print(f" {bold('Transaction analysis:')}" +
-                  f" {dt['operations']} operations," +
-                  f" net flow: {dt['net_flow']} units")
-            print()
-            print(bold(" Initializing Event Stream..."))
-            print(f" {bold('Stream ID:')} {de['stream_id']}," +
-                  " Type: System Events")
-            print(f" {bold('Processing event batch:')} [{e1}]")
-            print(f" {bold('Event analysis:')} {de['events']} events," +
-                  f" {de['errors']} error detected")
+            es.display_stats()
             print()
 
             # Polymorphic Stream Processing
