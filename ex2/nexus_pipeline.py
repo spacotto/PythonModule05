@@ -48,7 +48,8 @@ class InputStage:
             adapter = "STREAM"
             parsed = self._parse_stream(raw_data)
         else:
-            parsed = {"error": f"Unknown pipeline type in ID: {pipeline_id}"}
+            print(f' Error! Unknown pipeline type in ID: {pipeline_id}')
+            parsed = None
 
         if parsed:
             print(f' Processing {adapter} data through pipeline...')
