@@ -12,15 +12,20 @@ in real-world data engineering.
 
 from abc import ABC, abstractmethod
 from typing import Any, List, Dict, Union, Protocol
-import collections
+import collections  # noqa: F401
 import time
 
 
-class  InvalidDataFormat(Exception):
+# ============================================================================
+# CUSTOM ERRORS
+# ============================================================================
+
+class InvalidDataFormat(Exception):
     """Custom error signaling invalid data format."""
     def __init__(self) -> None:
         self.message = "Invalid data format"
         super().__init__(self.message)
+
 
 # ============================================================================
 # STAGE IMPLEMENTATIONS
@@ -46,10 +51,13 @@ class InputStage:
 
             if self._parse_json(raw_data):
                 adapter = "JSON"
+                parsed = raw_data
             elif self._parse_csv(raw_data):
                 adapter = "CSV"
+                parsed = "user,action,timestamp"
             elif self._parse_stream(raw_data):
                 adapter = "STREAM"
+                parsed = raw_data
             else:
                 return data
 
@@ -58,7 +66,7 @@ class InputStage:
 
             data["data"] = raw_data
             data["header"] = f" Processing {adapter} data through pipeline..."
-            data["input"] = f" Input: {raw_data}"
+            data["input"] = f" Input: {parsed}"
 
         except Exception as e:
             print(f" Error detected in Stage 1: {e}")
@@ -135,7 +143,8 @@ class TransformStage:
 
             if "JSON" in pipeline_id:
                 data["data"] = self._transform_json(raw_content)
-                data["trans"] = " Transform: Enriched with metadata and validation"
+                data["trans"] = (" Transform: Enriched with" +
+                                 " metadata and validation")
             elif "CSV" in pipeline_id:
                 data["data"] = self._transform_csv(raw_content)
                 data["trans"] = " Transform: Parsed and structured data"
@@ -178,8 +187,8 @@ class TransformStage:
 
     def _transform_csv(self, data: List[str]) -> Dict[str, Any]:
         """Transform CSV data"""
-        return {'fields': data,
-                'count': len(data),
+        return {'fields': len(data),
+                'count': int(data[1]),
                 'type': 'csv_record'}
 
     def _transform_stream(self, data: List[Any]) -> Dict[str, Any]:
@@ -231,7 +240,8 @@ class OutputStage:
             return str(data['error'])
 
         if 'proc_read' in data:
-            return f"Processed temperature reading: {data['proc_read']} (Normal range)"
+            return ("Processed temperature reading:" +
+                    f" {data['proc_read']} (Normal range)")
 
         return str(data)
 
@@ -244,12 +254,14 @@ class OutputStage:
     def _format_stream(self, data: Dict[str, Any]) -> str:
         """Format stream output"""
         if 'count' in data and 'average' in data:
-            return f"Stream summary: {data['count']} readings, avg: {data['average']:.1f}°C"
+            return (f"Stream summary: {data['count']}" +
+                    f" readings, avg: {data['average']:.1f}°C")
         return str(data)
 
 # ============================================================================
 # ABSTRACT PIPELINE BASE CLASS
 # ============================================================================
+
 
 class ProcessingPipeline(ABC):
     """Abstract base class for all data processing pipelines"""
@@ -269,6 +281,7 @@ class ProcessingPipeline(ABC):
 # ============================================================================
 # ADAPTERS
 # ============================================================================
+
 
 class JSONAdapter(ProcessingPipeline):
     """Pipeline adapter for JSON data"""
@@ -294,6 +307,7 @@ class JSONAdapter(ProcessingPipeline):
 
         return info
 
+
 class CSVAdapter(ProcessingPipeline):
     """Pipeline adapter for CSV data"""
 
@@ -317,6 +331,7 @@ class CSVAdapter(ProcessingPipeline):
             info = stage.process(info)
 
         return info
+
 
 class StreamAdapter(ProcessingPipeline):
     """Pipeline adapter for stream data"""
@@ -345,6 +360,7 @@ class StreamAdapter(ProcessingPipeline):
 # ============================================================================
 # NEXUS MANAGER
 # ============================================================================
+
 
 class NexusManager:
     """Orchestrates multiple processing pipelines polymorphically"""
@@ -379,7 +395,8 @@ class NexusManager:
                 # If any error occured, initiate recovery process
                 elif info["flag"] == 2:
                     print(' Recovery initiated: Switching to backup processor')
-                    print(' Recovery successful: Pipeline restored, processing resumed')
+                    print(' Recovery successful: Pipeline restored,' +
+                          ' processing resumed')
 
 
 # ============================================================================
@@ -390,7 +407,7 @@ def main():
     """Demonstrate the Code Nexus pipeline system"""
 
     dataset: list = [{"sensor": "temp", "value": 23.5, "unit": "C"},
-                     "user,action,timestamp",
+                     "spacotto,1,18:42",
                      ["22.1", "21.9", "22.5", "22.3", "21.8"]]
 
     f_dataset: list = [{"sensor": "banana", "value": 23.5, "unit": "C"}]
@@ -433,7 +450,10 @@ def main():
     print(" === Multi-Format Data Processing ===")
     print()
 
+    start_time = time.time()
     manager.process_data(dataset)
+    end_time = time.time()
+    res = end_time - start_time
 
     print(" === Pipeline Chaining Demo ===")
     print(" Pipeline A -> Pipeline B -> Pipeline C")
@@ -441,7 +461,7 @@ def main():
     print()
 
     print(" Chain result: 100 records processed through 3-stage pipeline")
-    print(" Performance: 95% efficiency, 0.2s total processing time")
+    print(f" Performance: 95% efficiency, {res:.1f}s total processing time")
     print()
 
     print(" === Error Recovery Test ===")

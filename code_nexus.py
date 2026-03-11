@@ -175,7 +175,7 @@ class CodeNexus:
 
             # System Demo
             print()
-            print(bold(" CODE NEXUS: POLYMORPHIC STREAM SYSTEM"))
+            print(f"{W} CODE NEXUS: POLYMORPHIC STREAM SYSTEMI{O}")
             div()
 
             ss = SensorStream(stream_id)
@@ -202,7 +202,7 @@ class CodeNexus:
             sp.add_stream(ts)
             sp.add_stream(es)
 
-            print(bold(" Polymorphic Stream Processing"))
+            print(f"{W} Polymorphic Stream Processing{O}")
             div()
             sp.display_analysis(data_batch)
 
@@ -227,10 +227,10 @@ class CodeNexus:
             print(f" {W}Exercise 2 - Nexus Integration{O}")
             div()
 
-        # Collect data
-        json_data = input(f" {W}Enter JSON data: {O}")
-        csv_data = input(f" {W}Enter CSV data: {O}")
-        stream_data = input(f" {W}Enter Stream data: {O}")
+            # Collect data
+            json_data = input(f" {W}Enter JSON data: {O}")
+            csv_data = input(f" {W}Enter CSV data: {O}")
+            stream_data = input(f" {W}Enter Stream data: {O}")
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex2 — {e}{O}")
