@@ -16,6 +16,12 @@ import collections
 import time
 
 
+class  InvalidDataFormat(Exception):
+    """Custom error signaling invalid data format."""
+    def __init__(self) -> None:
+        self.message = "Invalid data format"
+        super().__init__(self.message)
+
 # ============================================================================
 # STAGE IMPLEMENTATIONS
 # ============================================================================
@@ -137,7 +143,6 @@ class TransformStage:
                 data["data"] = self._transform_stream(raw_content)
                 data["trans"] = " Transform: Aggregated and filtered"
 
-
         except Exception as e:
             print(f" Error detected in Stage 2: {e}")
             data["flag"] = 2
@@ -153,7 +158,7 @@ class TransformStage:
         data['validation'] = 'passed'
 
         # Add processed reading
-        sensor = data.get("sensor", "").lower()
+        sensor = data.get("sensor", "")
         value = data.get("value", 0.0)
         unit = data.get("unit", "")
 
@@ -161,8 +166,13 @@ class TransformStage:
             data['proc_read'] = f"{value}°{unit}"
         elif sensor == "humidity":
             data['proc_read'] = f"{value}%"
-        else:
+        elif sensor == "pressure":
             data['proc_read'] = f"{value} {unit}"
+        else:
+            raise InvalidDataFormat
+
+        if unit not in ("C", "%", "Pa"):
+            raise InvalidDataFormat
 
         return data
 
@@ -383,6 +393,8 @@ def main():
                      "user,action,timestamp",
                      ["22.1", "21.9", "22.5", "22.3", "21.8"]]
 
+    f_dataset: list = [{"sensor": "banana", "value": 23.5, "unit": "C"}]
+
     print(' === CODE NEXUS - ENTERPRISE PIPELINE SYSTEM ===')
     print()
 
@@ -422,7 +434,6 @@ def main():
     print()
 
     manager.process_data(dataset)
-    print()
 
     print(" === Pipeline Chaining Demo ===")
     print(" Pipeline A -> Pipeline B -> Pipeline C")
@@ -436,6 +447,7 @@ def main():
     print(" === Error Recovery Test ===")
     print(" Simulating pipeline failure...")
 
+    manager.process_data(f_dataset)
     print()
 
     print(" Nexus Integration complete. All systems operational.")
