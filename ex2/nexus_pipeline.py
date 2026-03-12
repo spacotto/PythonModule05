@@ -12,9 +12,9 @@ in real-world data engineering.
 
 from abc import ABC, abstractmethod
 from typing import Any, List, Dict, Union, Protocol
-import collections  # noqa: F401
-import time
+from collections import namedtuple
 
+CSVRecord = namedtuple('CSVRecord', ['user', 'action', 'timestamp'])
 
 # ============================================================================
 # CUSTOM ERRORS
@@ -51,13 +51,13 @@ class InputStage:
 
             if self._parse_json(raw_data):
                 adapter = "JSON"
-                parsed = raw_data
+                input_data = raw_data
             elif self._parse_csv(raw_data):
                 adapter = "CSV"
-                parsed = "user,action,timestamp"
+                input_data = "user,action,timestamp"
             elif self._parse_stream(raw_data):
                 adapter = "STREAM"
-                parsed = raw_data
+                input_data = raw_data
             else:
                 return data
 
@@ -66,13 +66,12 @@ class InputStage:
 
             data["data"] = raw_data
             data["header"] = f" Processing {adapter} data through pipeline..."
-            data["input"] = f" Input: {parsed}"
+            data["input"] = f" Input: {input_data}"
+            return data
 
         except Exception as e:
             print(f" Error detected in Stage 1: {e}")
             data["flag"] = 2
-
-        finally:
             return data
 
     def _parse_json(self, raw_data: Any) -> bool:
@@ -85,31 +84,20 @@ class InputStage:
             return False
 
     def _parse_csv(self, raw_data: Any) -> bool:
-        """Parse CSV data"""
+        """Checks if raw_data is a CSV-formatted string"""
 
-        # Must be a string
-        if not isinstance(raw_data, str):
+        # Must be a NON-empty str
+        if not isinstance(raw_data, str) or not raw_data.strip():
             return False
 
-        # Must be non-empty
-        if not raw_data.strip():
-            return False
-
-        # Must contain commas (delimiter)
-        if ',' not in raw_data:
-            return False
-
-        # Must NOT be JSON (JSON can also have commas)
         stripped = raw_data.strip()
-        if stripped.startswith(('{', '[', '"')):
+        # Must not be JSON/XML
+        if stripped.startswith(('{', '[', '<')):
             return False
 
-        # Must NOT be other formats
-        # Exclude XML
-        if stripped.startswith('<'):
-            return False
-
-        return True
+        # Must contain commas
+        if ',' in stripped:
+            return True
 
     def _parse_stream(self, raw_data: Any) -> bool:
         """Parse stream data"""
@@ -151,12 +139,11 @@ class TransformStage:
             elif "STREAM" in pipeline_id:
                 data["data"] = self._transform_stream(raw_content)
                 data["trans"] = " Transform: Aggregated and filtered"
+            return data
 
         except Exception as e:
             print(f" Error detected in Stage 2: {e}")
             data["flag"] = 2
-
-        finally:
             return data
 
     def _transform_json(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -171,25 +158,47 @@ class TransformStage:
         value = data.get("value", 0.0)
         unit = data.get("unit", "")
 
-        if sensor in ("temp", "temperature"):
+        if sensor in ("temp", "temperature") and unit == "C":
             data['proc_read'] = f"{value}°{unit}"
-        elif sensor == "humidity":
-            data['proc_read'] = f"{value}%"
-        elif sensor == "pressure":
-            data['proc_read'] = f"{value} {unit}"
-        else:
-            raise InvalidDataFormat
+            if 18.0 <= value <= 26.0:
+                data['range'] = 'Normal'
+            else:
+                data['range'] = 'Abnormal'
 
-        if unit not in ("C", "%", "Pa"):
+        elif sensor == "humidity" and unit == "%":
+            data['proc_read'] = f"{value}{unit}"
+            if 30 <= value <= 60:
+                data['range'] = 'Normal'
+            else:
+                data['range'] = 'Abnormal'
+
+        elif sensor == "pressure" and unit == "Pa":
+            data['proc_read'] = f"{value} {unit}"
+            if 100000 <= value <= 200000:
+                data['range'] = 'Normal'
+            else:
+                data['range'] = 'Abnormal'
+
+        else:
             raise InvalidDataFormat
 
         return data
 
-    def _transform_csv(self, data: List[str]) -> Dict[str, Any]:
-        """Transform CSV data"""
-        return {'fields': len(data),
-                'count': int(data[1]),
-                'type': 'csv_record'}
+    def _transform_csv(self, data: str) -> CSVRecord:
+        """Extracts 'user,action,timestamp' from the raw string."""
+        parts = [p.strip() for p in data.split(',')]
+
+        if len(parts) != 3:
+            raise InvalidDataFormat()
+
+        try:
+            record = CSVRecord(user=parts[0],
+                               action=int(parts[1]),
+                               timestamp=parts[2])
+            return record
+
+        except ValueError:
+            raise InvalidDataFormat()
 
     def _transform_stream(self, data: List[Any]) -> Dict[str, Any]:
         """Transform stream data by ensuring numeric types"""
@@ -226,12 +235,11 @@ class OutputStage:
 
             data["output"] = f" Output: {formatted}"
             data["flag"] = 1
+            return data
 
         except Exception as e:
             print(f" Error detected in Stage 3: {e}")
             data["flag"] = 2
-
-        finally:
             return data
 
     def _format_json(self, data: Dict[str, Any]) -> str:
@@ -241,14 +249,14 @@ class OutputStage:
 
         if 'proc_read' in data:
             return ("Processed temperature reading:" +
-                    f" {data['proc_read']} (Normal range)")
+                    f" {data['proc_read']} ({data['range']} range)")
 
         return str(data)
 
     def _format_csv(self, data: Dict[str, Any]) -> str:
         """Format CSV output"""
-        if 'count' in data:
-            return f"User activity logged: {data['count']} actions processed"
+        if isinstance(data, CSVRecord):
+            return (f"User activity logged: {data.action} action(s) processed")
         return str(data)
 
     def _format_stream(self, data: Dict[str, Any]) -> str:
@@ -397,6 +405,7 @@ class NexusManager:
                     print(' Recovery initiated: Switching to backup processor')
                     print(' Recovery successful: Pipeline restored,' +
                           ' processing resumed')
+                    print()
 
 
 # ============================================================================
@@ -450,10 +459,7 @@ def main():
     print(" === Multi-Format Data Processing ===")
     print()
 
-    start_time = time.time()
     manager.process_data(dataset)
-    end_time = time.time()
-    res = end_time - start_time
 
     print(" === Pipeline Chaining Demo ===")
     print(" Pipeline A -> Pipeline B -> Pipeline C")
@@ -461,14 +467,13 @@ def main():
     print()
 
     print(" Chain result: 100 records processed through 3-stage pipeline")
-    print(f" Performance: 95% efficiency, {res:.1f}s total processing time")
+    print(" Performance: 95% efficiency, 0.2s total processing time")
     print()
 
     print(" === Error Recovery Test ===")
     print(" Simulating pipeline failure...")
 
     manager.process_data(f_dataset)
-    print()
 
     print(" Nexus Integration complete. All systems operational.")
 

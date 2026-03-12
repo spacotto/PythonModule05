@@ -229,72 +229,53 @@ class CodeNexus:
             div()
             print(f" {W}Exercise 2 - Nexus Integration{O}")
             div()
+            print()
 
             # Init dataset
             dataset: list = []
 
-            # Add JSON data to dataset
-            json_input = input(f" {W}How many JSON entries? (or enter raw data): {O}")
+            # --- Add JSON data to dataset ---
+
+            print(f"{W} Enter JSON data{O}")
+            div()
+            sensor = input(f"{W} Enter sensor (temperature/humidity/pressure): {O}")
+            value = input(f"{W} Enter value (float): {O}")
+            unit = input(f"{W} Enter unit (C, %, or Pa): {O}")
+            print()
 
             try:
-                # Try to parse as integer for auto-generation
-                num_json = int(json_input)
+                json_entry = {"sensor": sensor.strip(),
+                              "value": float(value),
+                              "unit": unit.strip()}
+                dataset.append(json_entry)
 
-                valid_sensors = ["temperature", "humidity", "pressure"]
-                units = {"temperature": "C", "humidity": "%", "pressure": "Pa"}
-                ranges = {
-                            "temperature": (15.0, 35.0),
-                            "humidity": (20.0, 100.0),
-                            "pressure": (980.0, 1060.0)
-                         }
+            except Exception as e:
+                print(" {Y}WARNING!{O} {e}.")
+                dataset.append(json_entry)
 
-                for _ in range(num_json):
-                    sensor = random.choice(valid_sensors)
-                    low, high = ranges[sensor]
-                    value = round(random.uniform(low, high), 1)
-                    unit = units[sensor]
+            # --- Add CSV data to dataset ---
 
-                    json_entry = {
-                                    "sensor": sensor,
-                                    "value": value,
-                                    "unit": unit
-                                 }
-                    dataset.append(json_entry)
-
-            except ValueError:
-                # Not an integer - treat as raw string input
-                dataset.append(json_input)
-                print(f" {Y}⚠ Added raw input for testing: {json_input}{O}")
-
-            # Add CSV data to dataset
-            csv_input = input(f" {W}How many CSV entries? (or enter raw data): {O}")
+            print(f"{W} Enter CSV data{O}")
+            div()
+            user = input(f" {W}Enter user: {O}")
+            action = input(f" {W}Enter actions (int): {O}")
+            timestamp = input(f" {W}Enter timestamp: {O}")
+            print()
 
             try:
-                # Try to parse as integer for auto-generation
-                num_csv = int(csv_input)
+                csv_entry = f"{user},{action},{timestamp}"
+                dataset.append(csv_entry)
 
-                valid_users = ["alice", "bob", "charlie", "diana", "eve"]
-                valid_actions = ["login", "logout", "upload", "download", "edit"]
-
-                for _ in range(num_csv):
-                    user = random.choice(valid_users)
-                    action = random.choice(valid_actions)
-
-                    # Generate timestamp (HH:MM format)
-                    hour = random.randint(0, 23)
-                    minute = random.randint(0, 59)
-                    timestamp = f"{hour:02d}:{minute:02d}"
-
-                    csv_entry = f"{user},{action},{timestamp}"
-                    dataset.append(csv_entry)
-
-            except ValueError:
-                # Not an integer - treat as raw string input
-                dataset.append(csv_input)
-                print(f" {Y}⚠ Added raw input for testing: {csv_input}{O}")
+            except Exception as e:
+                print(" {Y}WARNING!{O} {e}.")
+                dataset.append(csv_entry)
 
             # --- Add Stream data to dataset ---
+
+            print(f"{W} Enter Stream data{O}")
+            div()
             stream_input = input(f" {W}How many stream values? (or enter raw data): {O}")
+            print()
 
             try:
                 # Try to parse as integer for auto-generation
@@ -308,10 +289,9 @@ class CodeNexus:
 
                 dataset.append(stream_entry)
 
-            except ValueError:
-                # Not an integer - treat as raw input
+            except Exception as e:
+                print(" {Y}WARNING!{O} {e}.")
                 dataset.append(stream_input)
-                print(f" {Y}⚠ Added raw input for testing: {stream_input}{O}")
 
             print()
 
