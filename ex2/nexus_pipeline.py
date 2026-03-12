@@ -16,6 +16,7 @@ from collections import namedtuple
 
 CSVRecord = namedtuple('CSVRecord', ['user', 'action', 'timestamp'])
 
+
 # ============================================================================
 # CUSTOM ERRORS
 # ============================================================================

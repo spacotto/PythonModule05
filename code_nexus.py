@@ -238,7 +238,7 @@ class CodeNexus:
 
             print(f"{W} Enter JSON data{O}")
             div()
-            sensor = input(f"{W} Enter sensor (temperature/humidity/pressure): {O}")
+            sensor = input(f"{W} Enter sensor (temperature/humidity/pressure): {O}")  # noqa: E501
             value = input(f"{W} Enter value (float): {O}")
             unit = input(f"{W} Enter unit (C, %, or Pa): {O}")
             print()
@@ -250,7 +250,7 @@ class CodeNexus:
                 dataset.append(json_entry)
 
             except Exception as e:
-                print(" {Y}WARNING!{O} {e}.")
+                print(f" {Y}WARNING!{O} {e}.")
                 dataset.append(json_entry)
 
             # --- Add CSV data to dataset ---
@@ -267,14 +267,15 @@ class CodeNexus:
                 dataset.append(csv_entry)
 
             except Exception as e:
-                print(" {Y}WARNING!{O} {e}.")
+                print(f" {Y}WARNING!{O} {e}.")
                 dataset.append(csv_entry)
 
             # --- Add Stream data to dataset ---
 
             print(f"{W} Enter Stream data{O}")
             div()
-            stream_input = input(f" {W}How many stream values? (or enter raw data): {O}")
+            stream_input = input(f" {W}How many stream values?" +
+                                 f" (or enter raw data): {O}")
             print()
 
             try:
@@ -290,7 +291,7 @@ class CodeNexus:
                 dataset.append(stream_entry)
 
             except Exception as e:
-                print(" {Y}WARNING!{O} {e}.")
+                print(f" {Y}WARNING!{O} {e}.")
                 dataset.append(stream_input)
 
             print()
