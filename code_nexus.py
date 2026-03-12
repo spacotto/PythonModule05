@@ -249,15 +249,13 @@ class CodeNexus:
 
             print(f"{W} Enter JSON data{O}")
             div()
-            sensor = input(f"{W} Enter sensor (temperature/humidity/pressure): {O}")  # noqa: E501
-            value = input(f"{W} Enter value (float): {O}")
-            unit = input(f"{W} Enter unit (C, %, or Pa): {O}")
+            value = input(f"{W} Enter temp value (float): {O}")
             print()
 
             try:
-                json_entry = {"sensor": sensor.strip(),
+                json_entry = {"sensor": "temp",
                               "value": float(value),
-                              "unit": unit.strip()}
+                              "unit": "C"}
                 dataset.append(json_entry)
 
             except Exception as e:

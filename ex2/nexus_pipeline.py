@@ -52,13 +52,13 @@ class InputStage:
 
             if self._parse_json(raw_data):
                 adapter = "JSON"
-                input_data = raw_data
+                data_format = raw_data
             elif self._parse_csv(raw_data):
                 adapter = "CSV"
-                input_data = "user,action,timestamp"
+                data_format = "user,action,timestamp"
             elif self._parse_stream(raw_data):
                 adapter = "STREAM"
-                input_data = raw_data
+                data_format = "Real-time sensor stream"
             else:
                 return data
 
@@ -67,7 +67,7 @@ class InputStage:
 
             data["data"] = raw_data
             data["header"] = f" Processing {adapter} data through pipeline..."
-            data["input"] = f" Input: {input_data}"
+            data["input"] = f" Input: {data_format}"
             return data
 
         except Exception as e:
@@ -149,12 +149,6 @@ class TransformStage:
 
     def _transform_json(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Transform JSON data"""
-
-        # Add processing metadata
-        data['processed'] = True
-        data['validation'] = 'passed'
-
-        # Add processed reading
         sensor = data.get("sensor", "")
         value = data.get("value", 0.0)
         unit = data.get("unit", "")
@@ -162,20 +156,6 @@ class TransformStage:
         if sensor in ("temp", "temperature") and unit == "C":
             data['proc_read'] = f"{value}°{unit}"
             if 18.0 <= value <= 26.0:
-                data['range'] = 'Normal'
-            else:
-                data['range'] = 'Abnormal'
-
-        elif sensor == "humidity" and unit == "%":
-            data['proc_read'] = f"{value}{unit}"
-            if 30 <= value <= 60:
-                data['range'] = 'Normal'
-            else:
-                data['range'] = 'Abnormal'
-
-        elif sensor == "pressure" and unit == "Pa":
-            data['proc_read'] = f"{value} {unit}"
-            if 100000 <= value <= 200000:
                 data['range'] = 'Normal'
             else:
                 data['range'] = 'Abnormal'

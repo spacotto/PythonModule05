@@ -197,7 +197,7 @@ def main() -> None:
 
     print()
     print(bold(" Initializing Numeric Processor..."))
-    print(f" {bold('Processing data:')} {n1}")
+    print(f' {bold("Processing data:")} {n1}')
     np = NumericProcessor()
     result = np.process(n1)
     np.validate(n1)
@@ -205,7 +205,7 @@ def main() -> None:
 
     print()
     print(bold(" Initializing Text Processor..."))
-    print(f" {bold('Processing data:')} {t1}")
+    print(f' {bold("Processing data:")} "{t1}"')
     tp = TextProcessor()
     result = tp.process(t1)
     tp.validate(t1)
@@ -213,7 +213,7 @@ def main() -> None:
 
     print()
     print(bold(" Initializing Log Processor..."))
-    print(f" {bold('Processing data:')} {l1}")
+    print(f' {bold("Processing data:")} "{l1}"')
     lp = LogProcessor()
     result = lp.process(l1)
     lp.validate(l1)
