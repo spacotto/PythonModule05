@@ -65,21 +65,27 @@ class CodeNexus:
 
             # Numeric Processor Test
             print()
-            np = NumericProcessor(numeric)
+            print(f"{W} Initializing Numeric Processor...{O}")
+            print(f"{W} Processing data:{O} {numeric}")
+            np = NumericProcessor()
             result = np.process(numeric)
             np.validate(numeric)
             print(np.format_output(result))
 
             # Text Processor Test
             print()
-            tp = TextProcessor(text)
+            print(f"{W} Initializing Text Processor...{O}")
+            print(f"{W} Processing data:{O} {text}")
+            tp = TextProcessor()
             result = tp.process(text)
             tp.validate(text)
             print(tp.format_output(result))
 
             # Log Processor Test
             print()
-            lp = LogProcessor(log)
+            print(f"{W} Initializing Log Processor...{O}")
+            print(f"{W} Processing data:{O} {log}")
+            lp = LogProcessor()
             result = lp.process(log)
             lp.validate(log)
             print(lp.format_output(result))
