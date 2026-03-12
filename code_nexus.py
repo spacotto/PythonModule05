@@ -221,16 +221,140 @@ class CodeNexus:
                 CSVAdapter,
                 StreamAdapter,
                 NexusManager,
+                InputStage,
+                TransformStage,
+                OutputStage,
             )
 
             div()
             print(f" {W}Exercise 2 - Nexus Integration{O}")
             div()
 
-            # Collect data
-            json_data = input(f" {W}Enter JSON data: {O}")
-            csv_data = input(f" {W}Enter CSV data: {O}")
-            stream_data = input(f" {W}Enter Stream data: {O}")
+            # Init dataset
+            dataset: list = []
+
+            # Add JSON data to dataset
+            json_input = input(f" {W}How many JSON entries? (or enter raw data): {O}")
+
+            try:
+                # Try to parse as integer for auto-generation
+                num_json = int(json_input)
+
+                valid_sensors = ["temperature", "humidity", "pressure"]
+                units = {"temperature": "C", "humidity": "%", "pressure": "Pa"}
+                ranges = {
+                            "temperature": (15.0, 35.0),
+                            "humidity": (20.0, 100.0),
+                            "pressure": (980.0, 1060.0)
+                         }
+
+                for _ in range(num_json):
+                    sensor = random.choice(valid_sensors)
+                    low, high = ranges[sensor]
+                    value = round(random.uniform(low, high), 1)
+                    unit = units[sensor]
+
+                    json_entry = {
+                                    "sensor": sensor,
+                                    "value": value,
+                                    "unit": unit
+                                 }
+                    dataset.append(json_entry)
+
+            except ValueError:
+                # Not an integer - treat as raw string input
+                dataset.append(json_input)
+                print(f" {Y}⚠ Added raw input for testing: {json_input}{O}")
+
+            # Add CSV data to dataset
+            csv_input = input(f" {W}How many CSV entries? (or enter raw data): {O}")
+
+            try:
+                # Try to parse as integer for auto-generation
+                num_csv = int(csv_input)
+
+                valid_users = ["alice", "bob", "charlie", "diana", "eve"]
+                valid_actions = ["login", "logout", "upload", "download", "edit"]
+
+                for _ in range(num_csv):
+                    user = random.choice(valid_users)
+                    action = random.choice(valid_actions)
+
+                    # Generate timestamp (HH:MM format)
+                    hour = random.randint(0, 23)
+                    minute = random.randint(0, 59)
+                    timestamp = f"{hour:02d}:{minute:02d}"
+
+                    csv_entry = f"{user},{action},{timestamp}"
+                    dataset.append(csv_entry)
+
+            except ValueError:
+                # Not an integer - treat as raw string input
+                dataset.append(csv_input)
+                print(f" {Y}⚠ Added raw input for testing: {csv_input}{O}")
+
+            # --- Add Stream data to dataset ---
+            stream_input = input(f" {W}How many stream values? (or enter raw data): {O}")
+
+            try:
+                # Try to parse as integer for auto-generation
+                num_stream = int(stream_input)
+
+                # Generate a list of float values (temperature readings)
+                stream_entry = []
+                for _ in range(num_stream):
+                    value = round(random.uniform(18.0, 28.0), 1)
+                    stream_entry.append(str(value))
+
+                dataset.append(stream_entry)
+
+            except ValueError:
+                # Not an integer - treat as raw input
+                dataset.append(stream_input)
+                print(f" {Y}⚠ Added raw input for testing: {stream_input}{O}")
+
+            print()
+
+            # --- Pipeline System Demo ---
+            print(f"{W} CODE NEXUS - ENTERPRISE PIPELINE SYSTEM{O}")
+            div()
+
+            manager = NexusManager(1000)
+            print()
+
+            print(' Creating Data Processing Pipeline...')
+            print(' Stage 1: Input validation and parsing')
+            print(' Stage 2: Data transformation and enrichment')
+            print(' Stage 3: Output formatting and delivery')
+            print()
+
+            # Create JSON pipeline with stages
+            json_pipeline = JSONAdapter("001")
+            json_pipeline.add_stage(InputStage())
+            json_pipeline.add_stage(TransformStage())
+            json_pipeline.add_stage(OutputStage())
+
+            # Create CSV pipeline with stages
+            csv_pipeline = CSVAdapter("001")
+            csv_pipeline.add_stage(InputStage())
+            csv_pipeline.add_stage(TransformStage())
+            csv_pipeline.add_stage(OutputStage())
+
+            # Create Stream pipeline with stages
+            stream_pipeline = StreamAdapter("001")
+            stream_pipeline.add_stage(InputStage())
+            stream_pipeline.add_stage(TransformStage())
+            stream_pipeline.add_stage(OutputStage())
+
+            # Add configured pipelines to manager
+            manager.add_pipeline(json_pipeline)
+            manager.add_pipeline(csv_pipeline)
+            manager.add_pipeline(stream_pipeline)
+
+            print(f"{W} Multi-Format Data Processing{O}")
+            div()
+
+            manager.process_data(dataset)
 
         except ImportError as e:
             print(f" {R}❌ Could not import Ex2 — {e}{O}")
