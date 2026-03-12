@@ -250,42 +250,45 @@ class CodeNexus:
             print(f"{W} Enter JSON data{O}")
             div()
             value = input(f"{W} Enter temp value (float): {O}")
-            print()
 
             try:
                 json_entry = {"sensor": "temp",
                               "value": float(value),
                               "unit": "C"}
                 dataset.append(json_entry)
+                print()
 
             except Exception as e:
                 print(f" {Y}WARNING!{O} {e}.")
+                print(" Testing raw input.")
+                print()
+                json_entry = {"sensor": "temp",
+                              "value": value,
+                              "unit": "C"}
                 dataset.append(json_entry)
 
             # --- Add CSV data to dataset ---
 
             print(f"{W} Enter CSV data{O}")
             div()
-            user = input(f" {W}Enter user: {O}")
             action = input(f" {W}Enter actions (int): {O}")
-            timestamp = input(f" {W}Enter timestamp: {O}")
-            print()
 
             try:
-                csv_entry = f"{user},{action},{timestamp}"
+                csv_entry = f"user,{action},18:42"
                 dataset.append(csv_entry)
+                print()
 
             except Exception as e:
                 print(f" {Y}WARNING!{O} {e}.")
-                dataset.append(csv_entry)
+                print(" Testing raw input.")
+                print()
+                dataset.append(action)
 
             # --- Add Stream data to dataset ---
 
             print(f"{W} Enter Stream data{O}")
             div()
-            stream_input = input(f" {W}How many stream values?" +
-                                 f" (or enter raw data): {O}")
-            print()
+            stream_input = input(f" {W}How many stream values (int)? {O}")
 
             try:
                 # Try to parse as integer for auto-generation
@@ -298,12 +301,13 @@ class CodeNexus:
                     stream_entry.append(str(value))
 
                 dataset.append(stream_entry)
+                print()
 
             except Exception as e:
                 print(f" {Y}WARNING!{O} {e}.")
+                print(" Testing raw input.")
+                print()
                 dataset.append(stream_input)
-
-            print()
 
             # --- Pipeline System Demo ---
             print(f"{W} CODE NEXUS - ENTERPRISE PIPELINE SYSTEM{O}")
