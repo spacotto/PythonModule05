@@ -67,7 +67,6 @@ class SensorStream(DataStream):
 
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
-        print(bold(" Initializing Sensor Stream..."))
 
         self._stream_id: str = ""
         self._readings_processed: int = 0
@@ -169,7 +168,6 @@ class TransactionStream(DataStream):
 
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
-        print(bold(" Initializing Transaction Stream..."))
 
         self._stream_id: str = ""
         self._operations: int = 0
@@ -251,7 +249,6 @@ class EventStream(DataStream):
 
     def __init__(self, stream_id: str) -> None:
         """Print header and Stream ID format."""
-        print(bold(" Initializing Event Stream..."))
 
         self._stream_id: str = ""
         self._events: int = 0
@@ -371,18 +368,21 @@ def main() -> None:
     print(" === CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
     print()
 
+    print(bold(" Initializing Sensor Stream..."))
     ss = SensorStream(stream_id)
     ss.process_batch(data_batch0)
     ss.get_stats()
     ss.display_stats()
     print()
 
+    print(bold(" Initializing Transaction Stream..."))
     ts = TransactionStream(stream_id)
     ts.process_batch(data_batch0)
     ts.get_stats()
     ts.display_stats()
     print()
 
+    print(bold(" Initializing Event Stream..."))
     es = EventStream(stream_id)
     es.process_batch(data_batch0)
     es.get_stats()

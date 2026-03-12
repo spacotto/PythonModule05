@@ -184,18 +184,23 @@ class CodeNexus:
             print(f"{W} CODE NEXUS: POLYMORPHIC STREAM SYSTEMI{O}")
             div()
 
+            print(f"{W} Initializing Sensor Stream...{O}")
             ss = SensorStream(stream_id)
             ss.process_batch(data_batch)
             ss.get_stats()
             ss.display_stats()
             print()
 
+            print(f"{W} Initializing Transaction Stream...{O}")
+            ss = SensorStream(stream_id)
             ts = TransactionStream(stream_id)
             ts.process_batch(data_batch)
             ts.get_stats()
             ts.display_stats()
             print()
 
+            print(f"{W} Initializing Event Stream...{O}")
+            ss = SensorStream(stream_id)
             es = EventStream(stream_id)
             es.process_batch(data_batch)
             es.get_stats()
