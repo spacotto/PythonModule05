@@ -49,12 +49,9 @@ class DataProcessor(ABC):
 class NumericProcessor(DataProcessor):
     """Processor specifically for numerical list data."""
 
-    def __init__(self, data: Any):
-        print(bold(" Initializing Numeric Processor..."))
-        print(f" {bold('Processing data:')} {data}")
-
     def process(self, data: Any) -> str:
         """Validates and transforms data (expected: list of int)."""
+
         try:
             data_list = list(data)
             try:
@@ -99,12 +96,9 @@ class NumericProcessor(DataProcessor):
 class TextProcessor(DataProcessor):
     """Processor specifically for string data."""
 
-    def __init__(self, data: Any):
-        print(bold(" Initializing Text Processor..."))
-        print(f' {bold("Processing data:")} "{data}"')
-
     def process(self, data: Any) -> str:
         """Calculates character count and word count."""
+
         try:
             valid_data = str(data)
             char_count = len(valid_data)
@@ -138,13 +132,9 @@ class TextProcessor(DataProcessor):
 class LogProcessor(DataProcessor):
     """Processor specifically for log message strings."""
 
-    def __init__(self, data: Any):
-        print(bold(" Initializing Log Processor..."))
-        print(f' {bold("Processing data:")} "{data}"')
-        self.valid_log = ["ERROR", "INFO"]
-
     def process(self, data: Any) -> str:
         """Parses the log level and the message content."""
+        valid_log = ["ERROR", "INFO"]
 
         try:
             str(data)
@@ -152,7 +142,7 @@ class LogProcessor(DataProcessor):
             if len(parts) < 2:
                 raise InvalidLogFormatError()
             log_type = parts[0].strip()
-            if log_type not in self.valid_log:
+            if log_type not in valid_log:
                 raise InvalidLogFormatError()
             if log_type == "ERROR":
                 log_prefix = "[ALERT] ERROR"
@@ -167,6 +157,7 @@ class LogProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         """Checks if the input is a string containing a colon."""
+        valid_log = ["ERROR", "INFO"]
         result = "Validation failed"
 
         try:
@@ -175,7 +166,7 @@ class LogProcessor(DataProcessor):
             if len(parts) < 2:
                 raise InvalidLogFormatError()
             log_type = parts[0].strip()
-            if log_type not in self.valid_log:
+            if log_type not in valid_log:
                 raise InvalidLogFormatError()
             result = "Log entry verified"
             return True
@@ -205,19 +196,25 @@ def main() -> None:
     print(" === CODE NEXUS - DATA PROCESSOR FOUNDATION ===")
 
     print()
-    np = NumericProcessor(n1)
+    print(bold(" Initializing Numeric Processor..."))
+    print(f" {bold('Processing data:')} {n1}")
+    np = NumericProcessor()
     result = np.process(n1)
     np.validate(n1)
     print(np.format_output(result))
 
     print()
-    tp = TextProcessor(t1)
+    print(bold(" Initializing Text Processor..."))
+    print(f" {bold('Processing data:')} {t1}")
+    tp = TextProcessor()
     result = tp.process(t1)
     tp.validate(t1)
     print(tp.format_output(result))
 
     print()
-    lp = LogProcessor(l1)
+    print(bold(" Initializing Log Processor..."))
+    print(f" {bold('Processing data:')} {l1}")
+    lp = LogProcessor()
     result = lp.process(l1)
     lp.validate(l1)
     print(lp.format_output(result))
